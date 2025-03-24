@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - "9090:9090"
+      - "4000:4000"
+    networks:
+      - be_network
+    volumes:
+      - .:/opt/app:Z
+      - ./tmp:/opt/app/tmp 
+    command: ["air", "-c", "/opt/app/air.toml"]
+
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - be_network
+
+networks:
+  be_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
