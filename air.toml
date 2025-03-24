@@ -1,0 +1,56 @@
+# Config file for Air in TOML format
+
+# Working directory
+root = "/opt/app"
+tmp_dir = "/opt/app/tmp"
+
+[build]
+# Comando per compilare il backend in tmp/ (ora punta a ./cmd/be/)
+cmd = "go build -buildvcs=false -o /opt/app/tmp/main /opt/app/cmd/be"
+
+# Binario compilato
+bin = "/opt/app/tmp/main"
+
+# Imposta le variabili d’ambiente e avvia il backend
+full_bin = "BE_HOST=0.0.0.0 BE_PORT=9090 DB_HOST=postgres DB_USER=be_root DB_PASS=be_password DB_NAME=be DB_PORT=5432 /opt/app/tmp/main"
+
+# File e directory da monitorare
+include_ext = ["go", "tpl", "tmpl", "html"]
+exclude_dir = ["assets", "tmp", "vendor", "frontend/node_modules"]
+exclude_regex = ["_test\\.go"]
+exclude_unchanged = true
+
+# Log delle operazioni di Air
+log = "/opt/app/tmp/air.log"
+
+# Opzioni di polling
+poll = false
+poll_interval = 500 # ms
+delay = 1000 # ms
+stop_on_error = true
+rerun = false
+rerun_delay = 500
+
+[log]
+time = false
+main_only = false
+silent = false
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+clean_on_exit = true
+
+[screen]
+clear_on_rebuild = true
+keep_scroll = true
+
+[proxy]
+# Abilita live-reloading per il browser
+enabled = true
+proxy_port = 9091
+app_port = 9090
