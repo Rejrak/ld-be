@@ -1,0 +1,483 @@
+openapi: 3.0.3
+info:
+    title: Aion Service
+    description: A service for something that need to be managed
+    version: 0.0.1
+servers:
+    - url: http://localhost:9090
+paths:
+    /api/v1/user:
+        get:
+            tags:
+                - user
+            summary: list user
+            description: List all users with pagination
+            operationId: user#list
+            parameters:
+                - name: limit
+                  in: query
+                  description: Number of users to return per page
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: Number of users to return per page
+                    default: 10
+                    example: 10
+                    format: int64
+                    minimum: 1
+                    maximum: 100
+                  example: 10
+                - name: offset
+                  in: query
+                  description: Number of users to skip
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: Number of users to skip
+                    default: 0
+                    example: 0
+                    format: int64
+                    minimum: 0
+                  example: 0
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/User'
+                                example:
+                                    - admin: false
+                                      firstName: John
+                                      id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                      kcId: 550e8400-e29b-41d4-a716-446655440000
+                                      lastName: Doe
+                                      nickname: JD
+                                    - admin: false
+                                      firstName: John
+                                      id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                      kcId: 550e8400-e29b-41d4-a716-446655440000
+                                      lastName: Doe
+                                      nickname: JD
+                            example:
+                                - admin: false
+                                  firstName: John
+                                  id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                  kcId: 550e8400-e29b-41d4-a716-446655440000
+                                  lastName: Doe
+                                  nickname: JD
+                                - admin: false
+                                  firstName: John
+                                  id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                  kcId: 550e8400-e29b-41d4-a716-446655440000
+                                  lastName: Doe
+                                  nickname: JD
+                                - admin: false
+                                  firstName: John
+                                  id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                  kcId: 550e8400-e29b-41d4-a716-446655440000
+                                  lastName: Doe
+                                  nickname: JD
+        post:
+            tags:
+                - user
+            summary: create user
+            description: Create a new user
+            operationId: user#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUserPayload'
+                        example:
+                            admin: false
+                            firstName: John
+                            kcId: 550e8400-e29b-41d4-a716-446655440000
+                            lastName: Doe
+                            nickname: JD
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                            example:
+                                admin: false
+                                firstName: John
+                                id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                kcId: 550e8400-e29b-41d4-a716-446655440000
+                                lastName: Doe
+                                nickname: JD
+    /api/v1/user/{id}:
+        delete:
+            tags:
+                - user
+            summary: delete user
+            description: Delete a user
+            operationId: user#delete
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                    type: string
+                    description: User ID
+                    example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                    format: uuid
+                  example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            responses:
+                "204":
+                    description: No Content response.
+                "400":
+                    description: 'badRequest: Parametri non validi'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequest'
+                            example:
+                                fault: false
+                                id: Aonp24i2
+                                message: ID must be greater or equal than 1 but got value -1
+                                name: invalid_range
+                                temporary: false
+                                timeout: false
+                "401":
+                    description: 'unauthorized: Autenticazione fallita'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Unauthorized'
+                            example:
+                                message: Sit consequatur qui.
+                "404":
+                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFound'
+                            example:
+                                message: Optio repellat velit libero assumenda velit.
+                "500":
+                    description: 'internalServerError: Errore nel server'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerError'
+                            example:
+                                message: Sit quidem.
+        get:
+            tags:
+                - user
+            summary: get user
+            description: Get a user by ID
+            operationId: user#get
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                    type: string
+                    description: User ID
+                    example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                    format: uuid
+                  example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                            example:
+                                admin: false
+                                firstName: John
+                                id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                kcId: 550e8400-e29b-41d4-a716-446655440000
+                                lastName: Doe
+                                nickname: JD
+                "400":
+                    description: 'badRequest: Parametri non validi'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequest'
+                            example:
+                                fault: false
+                                id: Aonp24i2
+                                message: ID must be greater or equal than 1 but got value -1
+                                name: invalid_range
+                                temporary: false
+                                timeout: false
+                "401":
+                    description: 'unauthorized: Autenticazione fallita'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Unauthorized'
+                            example:
+                                message: Eos sit ullam.
+                "404":
+                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFound'
+                            example:
+                                message: Laborum nulla sapiente.
+                "500":
+                    description: 'internalServerError: Errore nel server'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerError'
+                            example:
+                                message: Vero ex cupiditate inventore.
+        put:
+            tags:
+                - user
+            summary: update user
+            description: Update a user
+            operationId: user#update
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                    type: string
+                    description: User ID
+                    example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                    format: uuid
+                  example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateUserPayload'
+                        example:
+                            admin: false
+                            firstName: John
+                            kcId: 550e8400-e29b-41d4-a716-446655440000
+                            lastName: Doe
+                            nickname: JD
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                            example:
+                                admin: false
+                                firstName: John
+                                id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                kcId: 550e8400-e29b-41d4-a716-446655440000
+                                lastName: Doe
+                                nickname: JD
+                "400":
+                    description: 'badRequest: Parametri non validi'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequest'
+                            example:
+                                fault: false
+                                id: Aonp24i2
+                                message: ID must be greater or equal than 1 but got value -1
+                                name: invalid_range
+                                temporary: false
+                                timeout: false
+                "401":
+                    description: 'unauthorized: Autenticazione fallita'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Unauthorized'
+                            example:
+                                message: Beatae et mollitia.
+                "404":
+                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFound'
+                            example:
+                                message: Ut dolores ex omnis culpa repudiandae.
+                "500":
+                    description: 'internalServerError: Errore nel server'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerError'
+                            example:
+                                message: Quae occaecati deleniti a est.
+components:
+    schemas:
+        BadRequest:
+            type: object
+            properties:
+                fault:
+                    type: boolean
+                    description: Indica se l'errore è dovuto a un problema del server
+                    example: false
+                id:
+                    type: string
+                    description: ID dell'errore
+                    example: Aonp24i2
+                message:
+                    type: string
+                    description: Descrizione dettagliata dell'errore
+                    example: ID must be greater or equal than 1 but got value -1
+                name:
+                    type: string
+                    description: Nome dell'errore
+                    example: invalid_range
+                temporary:
+                    type: boolean
+                    description: Indica se l'errore è temporaneo
+                    example: false
+                timeout:
+                    type: boolean
+                    description: Indica se l'errore è dovuto a un timeout
+                    example: false
+            description: Body di risposta per la richiesta non valida (400)
+            example:
+                fault: false
+                id: Aonp24i2
+                message: ID must be greater or equal than 1 but got value -1
+                name: invalid_range
+                temporary: false
+                timeout: false
+            required:
+                - name
+                - id
+                - message
+                - temporary
+                - timeout
+                - fault
+        CreateUserPayload:
+            type: object
+            properties:
+                admin:
+                    type: boolean
+                    description: Is admin?
+                    default: false
+                    example: false
+                firstName:
+                    type: string
+                    description: First name
+                    example: John
+                kcId:
+                    type: string
+                    description: Keycloak ID
+                    example: 550e8400-e29b-41d4-a716-446655440000
+                    format: uuid
+                lastName:
+                    type: string
+                    description: Last name
+                    example: Doe
+                nickname:
+                    type: string
+                    description: Nickname
+                    example: JD
+            example:
+                admin: false
+                firstName: John
+                kcId: 550e8400-e29b-41d4-a716-446655440000
+                lastName: Doe
+                nickname: JD
+            required:
+                - kcId
+                - firstName
+                - lastName
+        InternalServerError:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Descrizione dell'errore
+                    default: Errore di comunicazione con il server
+                    example: Laudantium sit sed voluptates et sit.
+            description: Errore nel server
+            example:
+                message: A quos dolor assumenda voluptatem et libero.
+            required:
+                - message
+        NotFound:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Descrizione dell'errore
+                    default: Dato non trovato
+                    example: Aut qui.
+            description: 'Dato non trovato all''interno del sistema '
+            example:
+                message: Recusandae corrupti autem.
+            required:
+                - message
+        Unauthorized:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Descrizione dell'errore
+                    default: Utente già registrato a
+                    example: Quasi voluptates non.
+            description: Errore di autenticazione non riuscita
+            example:
+                message: Occaecati dignissimos totam eos ut aut sint.
+            required:
+                - message
+        User:
+            type: object
+            properties:
+                admin:
+                    type: boolean
+                    description: Is the user an admin?
+                    default: false
+                    example: false
+                firstName:
+                    type: string
+                    description: First name of the user
+                    example: John
+                id:
+                    type: string
+                    description: Unique ID of the user
+                    example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                    format: uuid
+                kcId:
+                    type: string
+                    description: Keycloak ID
+                    example: 550e8400-e29b-41d4-a716-446655440000
+                    format: uuid
+                lastName:
+                    type: string
+                    description: Last name of the user
+                    example: Doe
+                nickname:
+                    type: string
+                    description: Nickname
+                    example: JD
+            example:
+                admin: false
+                firstName: John
+                id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                kcId: 550e8400-e29b-41d4-a716-446655440000
+                lastName: Doe
+                nickname: JD
+            required:
+                - id
+                - kcId
+                - firstName
+                - lastName
+tags:
+    - name: user
+      description: User service for managing users

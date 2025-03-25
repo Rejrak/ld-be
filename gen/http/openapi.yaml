@@ -1,0 +1,442 @@
+swagger: "2.0"
+info:
+    title: Aion Service
+    description: A service for something that need to be managed
+    version: 0.0.1
+host: localhost:9090
+basePath: /api/v1
+consumes:
+    - application/json
+    - application/xml
+    - application/gob
+produces:
+    - application/json
+    - application/xml
+    - application/gob
+paths:
+    /user:
+        get:
+            tags:
+                - user
+            summary: list user
+            description: List all users with pagination
+            operationId: user#list
+            parameters:
+                - name: limit
+                  in: query
+                  description: Number of users to return per page
+                  required: false
+                  type: integer
+                  default: 10
+                  maximum: 100
+                  minimum: 1
+                - name: offset
+                  in: query
+                  description: Number of users to skip
+                  required: false
+                  type: integer
+                  default: 0
+                  minimum: 0
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/definitions/User'
+            schemes:
+                - http
+        post:
+            tags:
+                - user
+            summary: create user
+            description: Create a new user
+            operationId: user#create
+            parameters:
+                - name: CreateRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CreateUserPayload'
+                    required:
+                        - kcId
+                        - firstName
+                        - lastName
+            responses:
+                "201":
+                    description: Created response.
+                    schema:
+                        $ref: '#/definitions/User'
+                        required:
+                            - id
+                            - kcId
+                            - firstName
+                            - lastName
+            schemes:
+                - http
+    /user/{id}:
+        get:
+            tags:
+                - user
+            summary: get user
+            description: Get a user by ID
+            operationId: user#get
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  type: string
+                  format: uuid
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/User'
+                        required:
+                            - id
+                            - kcId
+                            - firstName
+                            - lastName
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/BadRequest'
+                        required:
+                            - name
+                            - id
+                            - message
+                            - temporary
+                            - timeout
+                            - fault
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/Unauthorized'
+                        required:
+                            - message
+                "404":
+                    description: Not Found response.
+                    schema:
+                        $ref: '#/definitions/NotFound'
+                        required:
+                            - message
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        $ref: '#/definitions/InternalServerError'
+                        required:
+                            - message
+            schemes:
+                - http
+        put:
+            tags:
+                - user
+            summary: update user
+            description: Update a user
+            operationId: user#update
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  type: string
+                  format: uuid
+                - name: UpdateRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UserUpdateRequestBody'
+                    required:
+                        - kcId
+                        - firstName
+                        - lastName
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/User'
+                        required:
+                            - id
+                            - kcId
+                            - firstName
+                            - lastName
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/BadRequest'
+                        required:
+                            - name
+                            - id
+                            - message
+                            - temporary
+                            - timeout
+                            - fault
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/Unauthorized'
+                        required:
+                            - message
+                "404":
+                    description: Not Found response.
+                    schema:
+                        $ref: '#/definitions/NotFound'
+                        required:
+                            - message
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        $ref: '#/definitions/InternalServerError'
+                        required:
+                            - message
+            schemes:
+                - http
+        delete:
+            tags:
+                - user
+            summary: delete user
+            description: Delete a user
+            operationId: user#delete
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  type: string
+                  format: uuid
+            responses:
+                "204":
+                    description: No Content response.
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/BadRequest'
+                        required:
+                            - name
+                            - id
+                            - message
+                            - temporary
+                            - timeout
+                            - fault
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/Unauthorized'
+                        required:
+                            - message
+                "404":
+                    description: Not Found response.
+                    schema:
+                        $ref: '#/definitions/NotFound'
+                        required:
+                            - message
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        $ref: '#/definitions/InternalServerError'
+                        required:
+                            - message
+            schemes:
+                - http
+definitions:
+    BadRequest:
+        title: BadRequest
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Indica se l'errore è dovuto a un problema del server
+                example: false
+            id:
+                type: string
+                description: ID dell'errore
+                example: Aonp24i2
+            message:
+                type: string
+                description: Descrizione dettagliata dell'errore
+                example: ID must be greater or equal than 1 but got value -1
+            name:
+                type: string
+                description: Nome dell'errore
+                example: invalid_range
+            temporary:
+                type: boolean
+                description: Indica se l'errore è temporaneo
+                example: false
+            timeout:
+                type: boolean
+                description: Indica se l'errore è dovuto a un timeout
+                example: false
+        description: Parametri non validi
+        example:
+            fault: false
+            id: Aonp24i2
+            message: ID must be greater or equal than 1 but got value -1
+            name: invalid_range
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    CreateUserPayload:
+        title: CreateUserPayload
+        type: object
+        properties:
+            admin:
+                type: boolean
+                description: Is admin?
+                default: false
+                example: false
+            firstName:
+                type: string
+                description: First name
+                example: John
+            kcId:
+                type: string
+                description: Keycloak ID
+                example: 550e8400-e29b-41d4-a716-446655440000
+                format: uuid
+            lastName:
+                type: string
+                description: Last name
+                example: Doe
+            nickname:
+                type: string
+                description: Nickname
+                example: JD
+        example:
+            admin: false
+            firstName: John
+            kcId: 550e8400-e29b-41d4-a716-446655440000
+            lastName: Doe
+            nickname: JD
+        required:
+            - kcId
+            - firstName
+            - lastName
+    InternalServerError:
+        title: InternalServerError
+        type: object
+        properties:
+            message:
+                type: string
+                description: Descrizione dell'errore
+                default: Errore di comunicazione con il server
+                example: Et corporis.
+        description: Errore nel server
+        example:
+            message: Necessitatibus hic amet.
+        required:
+            - message
+    NotFound:
+        title: NotFound
+        type: object
+        properties:
+            message:
+                type: string
+                description: Descrizione dell'errore
+                default: Dato non trovato
+                example: Consequatur voluptas.
+        description: Dato non trovato all'interno del sistema
+        example:
+            message: Optio esse sed odit.
+        required:
+            - message
+    Unauthorized:
+        title: Unauthorized
+        type: object
+        properties:
+            message:
+                type: string
+                description: Descrizione dell'errore
+                default: Utente già registrato a
+                example: Alias praesentium repellendus ipsum.
+        description: Autenticazione fallita
+        example:
+            message: Molestias ad alias aut autem ea.
+        required:
+            - message
+    User:
+        title: User
+        type: object
+        properties:
+            admin:
+                type: boolean
+                description: Is the user an admin?
+                default: false
+                example: false
+            firstName:
+                type: string
+                description: First name of the user
+                example: John
+            id:
+                type: string
+                description: Unique ID of the user
+                example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                format: uuid
+            kcId:
+                type: string
+                description: Keycloak ID
+                example: 550e8400-e29b-41d4-a716-446655440000
+                format: uuid
+            lastName:
+                type: string
+                description: Last name of the user
+                example: Doe
+            nickname:
+                type: string
+                description: Nickname
+                example: JD
+        example:
+            admin: false
+            firstName: John
+            id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            kcId: 550e8400-e29b-41d4-a716-446655440000
+            lastName: Doe
+            nickname: JD
+        required:
+            - id
+            - kcId
+            - firstName
+            - lastName
+    UserUpdateRequestBody:
+        title: UserUpdateRequestBody
+        type: object
+        properties:
+            admin:
+                type: boolean
+                description: Is admin?
+                default: false
+                example: false
+            firstName:
+                type: string
+                description: First name
+                example: John
+            kcId:
+                type: string
+                description: Keycloak ID
+                example: 550e8400-e29b-41d4-a716-446655440000
+                format: uuid
+            lastName:
+                type: string
+                description: Last name
+                example: Doe
+            nickname:
+                type: string
+                description: Nickname
+                example: JD
+        example:
+            admin: false
+            firstName: John
+            kcId: 550e8400-e29b-41d4-a716-446655440000
+            lastName: Doe
+            nickname: JD
+        required:
+            - kcId
+            - firstName
+            - lastName
