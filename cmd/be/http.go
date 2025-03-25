@@ -1,7 +1,9 @@
 package main
 
 import (
+	trainingPlanGenSvr "be/gen/http/training_plan/server"
 	userGenSvr "be/gen/http/user/server"
+	trainingPlanGen "be/gen/training_plan"
 	userGen "be/gen/user"
 	"be/internal/config"
 	"be/internal/utils"
@@ -101,6 +103,7 @@ func errorHandler(logCtx context.Context) func(context.Context, http.ResponseWri
 
 func withMountedService(ctx context.Context, mux goahttp.Muxer, dec func(*http.Request) goahttp.Decoder, enc func(context.Context, http.ResponseWriter) goahttp.Encoder, eh func(context.Context, http.ResponseWriter, error), epsMap map[config.EndpointName]interface{}) {
 	var userGenServer *userGenSvr.Server
+	var trainingPlanGenServer *trainingPlanGenSvr.Server
 
 	for name, eps := range epsMap {
 		switch name {
@@ -108,6 +111,10 @@ func withMountedService(ctx context.Context, mux goahttp.Muxer, dec func(*http.R
 			userEndpoints := eps.(*userGen.Endpoints)
 			userGenServer = userGenSvr.New(userEndpoints, mux, dec, enc, eh, nil)
 			userGenSvr.Mount(mux, userGenServer)
+		case config.TrainingPlanEndPoint:
+			trainingPlanEndpoints := eps.(*trainingPlanGen.Endpoints)
+			trainingPlanGenServer = trainingPlanGenSvr.New(trainingPlanEndpoints, mux, dec, enc, eh, nil)
+			trainingPlanGenSvr.Mount(mux, trainingPlanGenServer)
 		}
 
 	}
