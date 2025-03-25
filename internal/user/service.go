@@ -25,8 +25,8 @@ type Service struct {
 
 func NewService() *Service {
 	var (
-		beDB     = db.DB.AionDB
-		client   = gocloak.NewClient("https://auth.nekos.app")
+		beDB     = db.DB.LD
+		client   = gocloak.NewClient("http://auth.nekos.app")
 		kcClient = os.Getenv("KC_CLIENT_ID")
 		kcSecret = os.Getenv("KC_CLIENT_SECRET")
 		kcRealm  = os.Getenv("KC_REALM")
@@ -52,7 +52,7 @@ func (s *Service) GetToken(ctx context.Context) (*gocloak.JWT, error) {
 func (s *Service) KcCreate(ctx context.Context, userModel models.User, password string) (uuid *string, err error) {
 	token, err := s.GetToken(ctx)
 	if err != nil {
-		return nil, errors.New("errore di comunicazione [KC-TK]")
+		return nil, errors.New("communication error [KC-TK]")
 	}
 
 	kcUser := gocloak.User{
@@ -69,7 +69,7 @@ func (s *Service) KcCreate(ctx context.Context, userModel models.User, password 
 	}
 
 	if err := s.client.SetPassword(ctx, token.AccessToken, userID, s.realm, password, false); err != nil {
-		return nil, errors.New("errore di comunicazione [KC-SP]")
+		return nil, errors.New("communication error [KC-SP]")
 	}
 
 	uuid = &userID
@@ -92,7 +92,7 @@ func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uui
 	}
 
 	if err := s.client.UpdateUser(ctx, token.AccessToken, s.realm, kcUser); err != nil {
-		return errors.New("errore di comunicazione [KC-UU]")
+		return errors.New("communication error [KC-UU]")
 	}
 
 	return nil
@@ -101,11 +101,11 @@ func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uui
 func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 	token, err := s.GetToken(ctx)
 	if err != nil {
-		return errors.New("errore di comunicazione [KC-TK]")
+		return errors.New("communication error [KC-TK]")
 	}
 
 	if err := s.client.DeleteUser(ctx, token.AccessToken, s.realm, uuid); err != nil {
-		return errors.New("errore di comunicazione [KC-DU]")
+		return errors.New("communication error [KC-DU]")
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func (s *Service) Create(ctx context.Context, payload *userService.CreateUserPay
 		Admin:     payload.Admin,
 	}
 
-	userID, err := s.KcCreate(ctx, userModel, "defaultPassword123!")
+	userID, err := s.KcCreate(ctx, userModel, *payload.Password)
 	if err != nil {
 		return nil, err
 	}

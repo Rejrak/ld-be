@@ -16,7 +16,7 @@ import (
 )
 
 type Dbinstance struct {
-	AionDB *gorm.DB
+	LD *gorm.DB
 }
 
 var DB Dbinstance
@@ -50,10 +50,10 @@ func ConnectDb() {
 	// 	log.Default().Print("Failed to drop all tables \n", err)
 	// }
 
-	// log.Println("running migrations")
-	// if err := db.AutoMigrate(&models.User{}, &models.CustomModel{}, &models.TrainingPlan{}, &models.Workout{}, &models.Exercise{}); err != nil {
-	// 	log.Default().Print("Failed to migrate database \n", err)
-	// }
+	log.Println("running migrations")
+	if err := db.AutoMigrate(&models.User{}, &models.CustomModel{}, &models.TrainingPlan{}, &models.Workout{}, &models.Exercise{}); err != nil {
+		log.Default().Print("Failed to migrate database \n", err)
+	}
 
 	// if err := populateData(db); err != nil {
 	// log.Default().Print("Failed to populate data \n", err)
@@ -63,7 +63,7 @@ func ConnectDb() {
 	log.Printf("Connected to %s - %s\n", dbHost, dbName)
 
 	DB = Dbinstance{
-		AionDB: db,
+		LD: db,
 	}
 }
 

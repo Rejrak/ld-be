@@ -3,6 +3,10 @@ package config
 import (
 	userGen "be/gen/user"
 	userService "be/internal/user"
+
+	trainingPlanGen "be/gen/training_plan"
+	trainingPlanService "be/internal/trainingPlan"
+
 	"context"
 
 	"goa.design/clue/debug"
@@ -12,7 +16,7 @@ import (
 type EndpointName string
 
 const (
-	StoreEndPoint EndpointName = "store"
+	TrainingPlanEndPoint EndpointName = "training-plan"
 	UserEndPoint  EndpointName = "user"
 )
 
@@ -35,11 +39,25 @@ func withUserService() ServiceConfig {
 	}
 }
 
+func withTrainingPlanService() ServiceConfig {
+	return ServiceConfig{
+		EndpointName: TrainingPlanEndPoint,
+		NewService:   func() interface{} { return trainingPlanService.NewService() },
+		NewEndpoints: func(svc interface{}) interface{} {
+			endpoints := trainingPlanGen.NewEndpoints(svc.(trainingPlanGen.Service))
+			endpoints.Use(debug.LogPayloads())
+			endpoints.Use(log.Endpoint)
+			return endpoints
+		},
+	}
+}
+
 func InitializeServices(ctx context.Context) map[EndpointName]interface{} {
 	userConfig := withUserService()
+	trainingPlanConfig := withTrainingPlanService()
 	epsMap := make(map[EndpointName]interface{})
 
-	services := []ServiceConfig{userConfig}
+	services := []ServiceConfig{userConfig, trainingPlanConfig}
 	for _, serviceConfig := range services {
 		svc := serviceConfig.NewService()              // Create a new service instance
 		endpoints := serviceConfig.NewEndpoints(svc)   // Generate endpoints for the service
