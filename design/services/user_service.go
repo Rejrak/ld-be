@@ -45,6 +45,12 @@ var CreateUserPayload = Type("CreateUserPayload", func() {
 	Attribute("nickname", String, "Nickname", func() {
 		Example("JD")
 	})
+	Attribute("password", String, "User password", func() {
+		MinLength(6)
+		Pattern(`^[a-zA-Z0-9!@#\$%\^&\*\(\)_\+\-=\[\]{};':"\\|,.<>\/?]{6,}$`)
+		Example("Secret!1")
+	})
+
 	Attribute("admin", Boolean, "Is admin?", func() {
 		Default(false)
 		Example(false)
