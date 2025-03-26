@@ -23,6 +23,8 @@ services:
     image: postgres:15
     container_name: postgres
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -33,6 +35,27 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - be_network
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak
+    command: start-dev
+    env_file:
+      - .env
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KC_DB_NAME}
+      KC_DB_USERNAME: ${DB_USER}
+      KC_DB_PASSWORD: ${DB_PASS}
+      KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASS}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - be_network
+
 
 networks:
   be_network:
