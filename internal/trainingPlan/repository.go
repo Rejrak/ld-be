@@ -1,76 +1,108 @@
 package trainingplan
 
 import (
-	"be/internal/database/models"
-	"be/internal/utils"
+	"be/internal/database/db"
 	"context"
+	"database/sql"
 	"errors"
+	"time"
 
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
+type TrainingPlan struct {
+	ID          uuid.UUID
+	Name        string
+	Description *string
+	StartDate   time.Time
+	EndDate     time.Time
+	UserID      uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   sql.NullTime
+}
+
 type Repository struct {
-	DB *gorm.DB
+	DB *sql.DB
 }
 
-func NewTrainingPlanRepository(db *gorm.DB) *Repository {
-	return &Repository{
-		DB: db,
-	}
+func NewRepository() *Repository {
+	return &Repository{DB: db.DB.LD}
 }
 
-func (r *Repository) FindByID(ctx context.Context, id string) (*models.TrainingPlan, error) {
-	var tp models.TrainingPlan
-	if err := r.DB.WithContext(ctx).
-		Preload("User").
-		Preload("Workouts").
-		Where("id = ?", id).
-		First(&tp).Error; err != nil {
+func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*TrainingPlan, error) {
+	query := `SELECT id, name, description, start_date, end_date, user_id FROM training_plan WHERE id = $1 AND deleted_at IS NULL`
 
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("training plan not found")
+	row := r.DB.QueryRowContext(ctx, query, id)
+
+	var tp TrainingPlan
+	err := row.Scan(&tp.ID, &tp.Name, &tp.Description, &tp.StartDate, &tp.EndDate, &tp.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
 		}
-		return nil, errors.New("errore di comunicazione [DB-FU]")
+		return nil, err
 	}
+
 	return &tp, nil
 }
 
-func (r *Repository) List(ctx context.Context, limit, offset int) ([]models.TrainingPlan, error) {
-	var tps []models.TrainingPlan
-	err := r.DB.WithContext(ctx).
-		Preload("User").
-		Preload("Workouts").
-		Limit(limit).Offset(offset).
-		Find(&tps).Error
+func (r *Repository) List(ctx context.Context, limit, offset int) ([]TrainingPlan, error) {
+	query := `SELECT id, name, description, start_date, end_date, user_id FROM training_plan WHERE deleted_at IS NULL ORDER BY start_date LIMIT $1 OFFSET $2`
+
+	rows, err := r.DB.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
-	return tps, nil
+	defer rows.Close()
+
+	var plans []TrainingPlan
+	for rows.Next() {
+		var tp TrainingPlan
+		err := rows.Scan(&tp.ID, &tp.Name, &tp.Description, &tp.StartDate, &tp.EndDate, &tp.UserID)
+		if err != nil {
+			return nil, err
+		}
+		plans = append(plans, tp)
+	}
+	return plans, nil
 }
 
-func (r *Repository) Save(ctx context.Context, tp models.TrainingPlan) (*models.TrainingPlan, error) {
-	if err := r.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.WithContext(ctx).Save(&tp).Error; err != nil {
-			utils.Log.Error(ctx, tp, err)
-			return err
-		}
-		return nil
-	}); err != nil {
-		utils.Log.Error(ctx, tp, err)
-		return nil, errors.New("errore di comunicazione [DB-UP]")
+func (r *Repository) Save(ctx context.Context, tp TrainingPlan) (*TrainingPlan, error) {
+	query := `INSERT INTO training_plan (id, name, description, start_date, end_date, user_id)
+	          VALUES ($1, $2, $3, $4, $5, $6)
+	          ON CONFLICT (id) DO UPDATE SET
+				name = EXCLUDED.name,
+				description = EXCLUDED.description,
+				start_date = EXCLUDED.start_date,
+				end_date = EXCLUDED.end_date,
+				user_id = EXCLUDED.user_id`
+
+	if tp.ID == uuid.Nil {
+		tp.ID = uuid.New()
 	}
+
+	_, err := r.DB.ExecContext(ctx, query,
+		tp.ID, tp.Name, tp.Description, tp.StartDate, tp.EndDate, tp.UserID)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &tp, nil
 }
 
-func (r *Repository) Delete(ctx context.Context, id string) error {
-	return r.DB.Transaction(func(tx *gorm.DB) error {
-		tp, err := r.FindByID(ctx, id)
-		if err != nil {
-			return err
-		}
-		if err := tx.WithContext(ctx).Delete(&tp).Error; err != nil {
-			return errors.New("errore durante l'eliminazione del training plan")
-		}
-		return nil
-	})
+func (r *Repository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `UPDATE training_plan SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL`
+	res, err := r.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err == nil && count == 0 {
+		return errors.New("training plan not found or already deleted")
+	}
+
+	return nil
 }
