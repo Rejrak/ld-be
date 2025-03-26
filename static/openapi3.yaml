@@ -34,18 +34,6 @@ paths:
                                       name: Upper Body Strength
                                       startDate: "2025-03-25T00:00:00Z"
                                       userId: 550e8400-e29b-41d4-a716-446655440000
-                                    - description: A 4-week plan focused on upper body hypertrophy.
-                                      endDate: "2025-04-25T00:00:00Z"
-                                      id: 11111111-2222-3333-4444-555555555555
-                                      name: Upper Body Strength
-                                      startDate: "2025-03-25T00:00:00Z"
-                                      userId: 550e8400-e29b-41d4-a716-446655440000
-                                    - description: A 4-week plan focused on upper body hypertrophy.
-                                      endDate: "2025-04-25T00:00:00Z"
-                                      id: 11111111-2222-3333-4444-555555555555
-                                      name: Upper Body Strength
-                                      startDate: "2025-03-25T00:00:00Z"
-                                      userId: 550e8400-e29b-41d4-a716-446655440000
                             example:
                                 - description: A 4-week plan focused on upper body hypertrophy.
                                   endDate: "2025-04-25T00:00:00Z"
@@ -59,6 +47,15 @@ paths:
                                   name: Upper Body Strength
                                   startDate: "2025-03-25T00:00:00Z"
                                   userId: 550e8400-e29b-41d4-a716-446655440000
+                                - description: A 4-week plan focused on upper body hypertrophy.
+                                  endDate: "2025-04-25T00:00:00Z"
+                                  id: 11111111-2222-3333-4444-555555555555
+                                  name: Upper Body Strength
+                                  startDate: "2025-03-25T00:00:00Z"
+                                  userId: 550e8400-e29b-41d4-a716-446655440000
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         post:
             tags:
                 - training_plan
@@ -90,6 +87,9 @@ paths:
                                 name: Upper Body Strength
                                 startDate: "2025-03-25T00:00:00Z"
                                 userId: 550e8400-e29b-41d4-a716-446655440000
+            security:
+                - oauth2_header_Authorization:
+                    - openid
     /api/v1/training-plans/{id}:
         delete:
             tags:
@@ -102,12 +102,15 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: a936ecb1-2416-45f1-aa23-741479c90772
+                    example: 2265bdf0-5f68-4b37-be8b-9cb87ffe43e2
                     format: uuid
-                  example: 6326813d-760d-4ca9-b46d-299e2265dbe3
+                  example: 92e0e03c-8fcb-433c-bc96-ec2d2709fcfd
             responses:
                 "204":
                     description: No Content response.
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         get:
             tags:
                 - training_plan
@@ -121,9 +124,9 @@ paths:
                   schema:
                     type: string
                     description: Training plan ID
-                    example: 554bc0ad-9171-4ef7-9346-9ace3dda288d
+                    example: fd57c7d8-88f8-4494-a5b5-9d6b987080e8
                     format: uuid
-                  example: 82039d46-8ba2-4cb7-bda0-3e5a53e9c0c9
+                  example: c871eeef-1a49-48a0-9407-a72ffaa93672
             responses:
                 "200":
                     description: OK response.
@@ -138,6 +141,9 @@ paths:
                                 name: Upper Body Strength
                                 startDate: "2025-03-25T00:00:00Z"
                                 userId: 550e8400-e29b-41d4-a716-446655440000
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         put:
             tags:
                 - training_plan
@@ -149,9 +155,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: 27ece96d-3e68-4cf5-bc2e-b2bbf5d888f8
+                    example: 93006a21-768b-4689-b085-d95b6676ec58
                     format: uuid
-                  example: 3494e5b5-71ee-4f1a-89e8-a05407a72ffa
+                  example: 6adb67ef-6326-413d-b60d-aca9346d299e
             requestBody:
                 required: true
                 content:
@@ -178,6 +184,9 @@ paths:
                                 name: Upper Body Strength
                                 startDate: "2025-03-25T00:00:00Z"
                                 userId: 550e8400-e29b-41d4-a716-446655440000
+            security:
+                - oauth2_header_Authorization:
+                    - openid
     /api/v1/user:
         get:
             tags:
@@ -233,6 +242,12 @@ paths:
                                       kcId: 550e8400-e29b-41d4-a716-446655440000
                                       lastName: Doe
                                       nickname: JD
+                                    - admin: false
+                                      firstName: John
+                                      id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                      kcId: 550e8400-e29b-41d4-a716-446655440000
+                                      lastName: Doe
+                                      nickname: JD
                             example:
                                 - admin: false
                                   firstName: John
@@ -246,6 +261,9 @@ paths:
                                   kcId: 550e8400-e29b-41d4-a716-446655440000
                                   lastName: Doe
                                   nickname: JD
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         post:
             tags:
                 - user
@@ -278,6 +296,9 @@ paths:
                                 kcId: 550e8400-e29b-41d4-a716-446655440000
                                 lastName: Doe
                                 nickname: JD
+            security:
+                - oauth2_header_Authorization:
+                    - openid
     /api/v1/user/{id}:
         delete:
             tags:
@@ -319,7 +340,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Unauthorized'
                             example:
-                                message: Unde nesciunt voluptatem dolores aut magnam alias.
+                                message: At qui fugiat in qui consectetur voluptas.
                 "404":
                     description: 'notFound: Dato non trovato all''interno del sistema'
                     content:
@@ -327,7 +348,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/NotFound'
                             example:
-                                message: Molestias maiores deserunt veritatis cumque.
+                                message: Aut perferendis aspernatur.
                 "500":
                     description: 'internalServerError: Errore nel server'
                     content:
@@ -335,7 +356,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/InternalServerError'
                             example:
-                                message: Et odit modi.
+                                message: Eum enim et maiores.
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         get:
             tags:
                 - user
@@ -387,7 +411,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Unauthorized'
                             example:
-                                message: Eum expedita eum cupiditate.
+                                message: Accusantium sapiente dolorem et ea.
                 "404":
                     description: 'notFound: Dato non trovato all''interno del sistema'
                     content:
@@ -395,7 +419,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/NotFound'
                             example:
-                                message: Aliquid eos commodi aut.
+                                message: Quibusdam nisi ipsa.
                 "500":
                     description: 'internalServerError: Errore nel server'
                     content:
@@ -403,7 +427,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/InternalServerError'
                             example:
-                                message: Rerum quidem.
+                                message: Aspernatur dolores atque incidunt.
+            security:
+                - oauth2_header_Authorization:
+                    - openid
         put:
             tags:
                 - user
@@ -466,7 +493,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Unauthorized'
                             example:
-                                message: Rerum accusamus consequuntur animi voluptas non est.
+                                message: Sit repudiandae ratione ducimus.
                 "404":
                     description: 'notFound: Dato non trovato all''interno del sistema'
                     content:
@@ -474,7 +501,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/NotFound'
                             example:
-                                message: Quos ut aut.
+                                message: Sed non est itaque laborum deleniti sint.
                 "500":
                     description: 'internalServerError: Errore nel server'
                     content:
@@ -482,7 +509,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/InternalServerError'
                             example:
-                                message: Maxime ut non.
+                                message: Qui fugiat ut.
+            security:
+                - oauth2_header_Authorization:
+                    - openid
 components:
     schemas:
         BadRequest:
@@ -582,6 +612,7 @@ components:
                     type: string
                     description: Nickname
                     example: JD
+                    maxLength: 16
                 password:
                     type: string
                     description: User password
@@ -604,10 +635,10 @@ components:
                     type: string
                     description: Descrizione dell'errore
                     default: Errore di comunicazione con il server
-                    example: Accusantium sapiente dolorem et ea.
+                    example: Maiores mollitia provident quia.
             description: Errore nel server
             example:
-                message: Est repellat.
+                message: Beatae quis facilis qui quis quam.
             required:
                 - message
         NotFound:
@@ -617,10 +648,10 @@ components:
                     type: string
                     description: Descrizione dell'errore
                     default: Dato non trovato
-                    example: Aspernatur dolores atque incidunt.
+                    example: Eius corporis esse dolorem ea.
             description: 'Dato non trovato all''interno del sistema '
             example:
-                message: Et nostrum.
+                message: Voluptas tempora.
             required:
                 - message
         TrainingPlan:
@@ -674,10 +705,10 @@ components:
                     type: string
                     description: Descrizione dell'errore
                     default: Utente già registrato a
-                    example: Tempora deleniti.
+                    example: Expedita corrupti nisi et repellat.
             description: Errore di autenticazione non riuscita
             example:
-                message: Qui sunt ipsa et mollitia.
+                message: Animi soluta et quod.
             required:
                 - message
         UpdateRequestBody:
@@ -750,8 +781,21 @@ components:
                 - kcId
                 - firstName
                 - lastName
+    securitySchemes:
+        oauth2_header_Authorization:
+            type: oauth2
+            description: OAuth2 flow
+            flows:
+                authorizationCode:
+                    authorizationUrl: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth
+                    tokenUrl: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token
+                    scopes:
+                        openid: Access basic profile
 tags:
     - name: training_plan
       description: Service for managing training plans
     - name: user
       description: User service for managing users
+security:
+    - oauth2__:
+        - openid
