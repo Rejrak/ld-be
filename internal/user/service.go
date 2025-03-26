@@ -1,22 +1,20 @@
 package user
 
 import (
-	"be/internal/database/db"
-	"be/internal/database/models"
 	"context"
 	"errors"
 	"os"
 
 	userService "be/gen/user"
+	"be/internal/utils"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/google/uuid"
+	"goa.design/clue/log"
 	"gorm.io/gorm"
 )
 
 type Service struct {
 	Repository   *Repository
-	ctx          context.Context
 	client       *gocloak.GoCloak
 	clientID     string
 	clientSecret string
@@ -25,8 +23,7 @@ type Service struct {
 
 func NewService() *Service {
 	var (
-		beDB     = db.DB.LD
-		client   = gocloak.NewClient("http://auth.nekos.app")
+		client   = gocloak.NewClient("http://keycloak:8080")
 		kcClient = os.Getenv("KC_CLIENT_ID")
 		kcSecret = os.Getenv("KC_CLIENT_SECRET")
 		kcRealm  = os.Getenv("KC_REALM")
@@ -36,22 +33,24 @@ func NewService() *Service {
 		clientID:     kcClient,
 		clientSecret: kcSecret,
 		realm:        kcRealm,
-		Repository:   NewUserRepository(beDB),
+		Repository:   NewRepository(),
 	}
 }
 
 func (s *Service) GetToken(ctx context.Context) (*gocloak.JWT, error) {
 	token, err := s.client.LoginClient(ctx, s.clientID, s.clientSecret, s.realm)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		rsp := errors.New("errore di comunicazione [DB-FU]")
 		return nil, rsp
 	}
 	return token, nil
 }
 
-func (s *Service) KcCreate(ctx context.Context, userModel models.User, password string) (uuid *string, err error) {
+func (s *Service) KcCreate(ctx context.Context, userModel User, password string) (uuid *string, err error) {
 	token, err := s.GetToken(ctx)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return nil, errors.New("communication error [KC-TK]")
 	}
 
@@ -65,6 +64,7 @@ func (s *Service) KcCreate(ctx context.Context, userModel models.User, password 
 
 	userID, err := s.client.CreateUser(ctx, token.AccessToken, s.realm, kcUser)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "KC_UC", V: err}, err)
 		return nil, errors.New("user already exists")
 	}
 
@@ -80,6 +80,7 @@ func (s *Service) KcCreate(ctx context.Context, userModel models.User, password 
 func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uuid string) (err error) {
 	token, err := s.GetToken(ctx)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return err
 	}
 
@@ -92,6 +93,7 @@ func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uui
 	}
 
 	if err := s.client.UpdateUser(ctx, token.AccessToken, s.realm, kcUser); err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return errors.New("communication error [KC-UU]")
 	}
 
@@ -101,10 +103,12 @@ func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uui
 func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 	token, err := s.GetToken(ctx)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return errors.New("communication error [KC-TK]")
 	}
 
 	if err := s.client.DeleteUser(ctx, token.AccessToken, s.realm, uuid); err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return errors.New("communication error [KC-DU]")
 	}
 	return nil
@@ -113,29 +117,31 @@ func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 // Create crea un nuovo utente sia in Keycloak che nel database
 func (s *Service) Create(ctx context.Context, payload *userService.CreateUserPayload) (*userService.User, error) {
 	// Creazione in Keycloak
-	userModel := models.User{
-		KCID:      uuid.MustParse(payload.KcID),
+	userModel := User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Nickname:  *payload.Nickname,
 		Admin:     payload.Admin,
 	}
 
-	userID, err := s.KcCreate(ctx, userModel, *payload.Password)
-	if err != nil {
-		return nil, err
-	}
-	userModel.KCID = uuid.MustParse(*userID)
+	// userID, err := s.KcCreate(ctx, userModel, *payload.Password)
+	// if err != nil {
+	// 	utils.Log.Error(ctx, log.KV{K: "KC-ER", V: err}, err)
+	// 	return nil, err
+	// }
+
+	// userModel.KcID = uuid.MustParse(*userID)
 
 	// Salvataggio nel database
 	savedModel, err := s.Repository.SaveUser(ctx, userModel)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "DB-ERR", V: err}, err)
 		return nil, err
 	}
 
 	return &userService.User{
-		ID:        savedModel.KCID.String(),
-		KcID:      savedModel.KCID.String(),
+		ID:        savedModel.ID.String(),
+		KcID:      savedModel.KcID.String(),
 		FirstName: savedModel.FirstName,
 		LastName:  savedModel.LastName,
 		Nickname:  &savedModel.Nickname,
@@ -148,14 +154,16 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 			return nil, &userService.NotFound{Message: "Utente non trovato"}
 		}
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return nil, err
 	}
 
 	return &userService.User{
-		ID:        user.KCID.String(),
-		KcID:      user.KCID.String(),
+		ID:        user.ID.String(),
+		KcID:      user.KcID.String(),
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Nickname:  &user.Nickname,
@@ -167,14 +175,15 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 func (s *Service) List(ctx context.Context, payload *userService.ListPayload) ([]*userService.User, error) {
 	users, err := s.Repository.List(ctx, payload.Limit, payload.Offset)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return nil, err
 	}
 
 	var response []*userService.User
 	for _, user := range users {
 		response = append(response, &userService.User{
-			ID:        user.KCID.String(),
-			KcID:      user.KCID.String(),
+			ID:        user.ID.String(),
+			KcID:      user.KcID.String(),
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
 			Nickname:  &user.Nickname,
@@ -190,8 +199,10 @@ func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 			return nil, &userService.NotFound{Message: "Utente non trovato"}
 		}
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return nil, err
 	}
 
@@ -205,18 +216,20 @@ func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload
 
 	_, err = s.Repository.SaveUser(ctx, *user)
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return nil, err
 	}
 
 	// Aggiorna in Keycloak
-	err = s.KcUpdate(ctx, &payload.FirstName, &payload.LastName, payload.KcID)
-	if err != nil {
-		return nil, err
-	}
+	// err = s.KcUpdate(ctx, &payload.FirstName, &payload.LastName, payload.KcID)
+	// if err != nil {
+	// 	utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+	// 	return nil, err
+	// }
 
 	return &userService.User{
-		ID:        user.KCID.String(),
-		KcID:      user.KCID.String(),
+		ID:        user.KcID.String(),
+		KcID:      user.KcID.String(),
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Nickname:  &user.Nickname,
@@ -230,20 +243,24 @@ func (s *Service) Delete(ctx context.Context, payload *userService.DeletePayload
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 			return &userService.NotFound{Message: "Utente non trovato"}
 		}
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return err
 	}
 
 	// Cancella da Keycloak
-	err = s.KcDelete(ctx, user.KCID.String())
-	if err != nil {
-		return err
-	}
+	// err = s.KcDelete(ctx, user.KcID.String())
+	// if err != nil {
+	// 	utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+	// 	return err
+	// }
 
 	// Cancella dal database
-	err = s.Repository.DeleteUser(ctx, user.KCID.String())
+	err = s.Repository.DeleteUser(ctx, user.ID.String())
 	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return err
 	}
 
