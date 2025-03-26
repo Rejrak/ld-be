@@ -48,7 +48,6 @@ func LoadServerConfig() *ServerConfig {
 		utils.Env.LoadEnv(".env") // Load .env file for VPN environment
 	case "local":
 		utils.Env.LoadEnv(".env_local") // Load .env_local file for local environment
-		break
 	default:
 		break // Panic if an unsupported environment is specified
 	}

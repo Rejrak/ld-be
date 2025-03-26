@@ -2,10 +2,10 @@ package config
 
 import (
 	userGen "be/gen/user"
-	userService "be/internal/user"
+	userService "be/internal/features/user"
 
 	trainingPlanGen "be/gen/training_plan"
-	trainingPlanService "be/internal/trainingPlan"
+	trainingPlanService "be/internal/features/trainingPlan"
 
 	"context"
 
@@ -17,7 +17,7 @@ type EndpointName string
 
 const (
 	TrainingPlanEndPoint EndpointName = "training-plan"
-	UserEndPoint  EndpointName = "user"
+	UserEndPoint         EndpointName = "user"
 )
 
 type ServiceConfig struct {
@@ -53,11 +53,12 @@ func withTrainingPlanService() ServiceConfig {
 }
 
 func InitializeServices(ctx context.Context) map[EndpointName]interface{} {
-	userConfig := withUserService()
-	trainingPlanConfig := withTrainingPlanService()
 	epsMap := make(map[EndpointName]interface{})
 
-	services := []ServiceConfig{userConfig, trainingPlanConfig}
+	services := []ServiceConfig{
+		withUserService(), 
+		withTrainingPlanService(),
+	}
 	for _, serviceConfig := range services {
 		svc := serviceConfig.NewService()              // Create a new service instance
 		endpoints := serviceConfig.NewEndpoints(svc)   // Generate endpoints for the service
