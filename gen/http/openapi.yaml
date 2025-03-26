@@ -179,7 +179,6 @@ paths:
                   schema:
                     $ref: '#/definitions/CreateUserPayload'
                     required:
-                        - kcId
                         - firstName
                         - lastName
             responses:
@@ -268,7 +267,6 @@ paths:
                   schema:
                     $ref: '#/definitions/UserUpdateRequestBody'
                     required:
-                        - kcId
                         - firstName
                         - lastName
             responses:
@@ -452,11 +450,6 @@ definitions:
                 type: string
                 description: First name
                 example: John
-            kcId:
-                type: string
-                description: Keycloak ID
-                example: 550e8400-e29b-41d4-a716-446655440000
-                format: uuid
             lastName:
                 type: string
                 description: Last name
@@ -474,12 +467,10 @@ definitions:
         example:
             admin: false
             firstName: John
-            kcId: 550e8400-e29b-41d4-a716-446655440000
             lastName: Doe
             nickname: JD
             password: Secret!1
         required:
-            - kcId
             - firstName
             - lastName
     InternalServerError:
@@ -661,11 +652,6 @@ definitions:
                 type: string
                 description: First name
                 example: John
-            kcId:
-                type: string
-                description: Keycloak ID
-                example: 550e8400-e29b-41d4-a716-446655440000
-                format: uuid
             lastName:
                 type: string
                 description: Last name
@@ -677,10 +663,8 @@ definitions:
         example:
             admin: false
             firstName: John
-            kcId: 550e8400-e29b-41d4-a716-446655440000
             lastName: Doe
             nickname: JD
         required:
-            - kcId
             - firstName
             - lastName
