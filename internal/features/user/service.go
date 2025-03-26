@@ -11,6 +11,8 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 	"goa.design/clue/log"
 	"gorm.io/gorm"
+
+	"goa.design/goa/v3/security"
 )
 
 type Service struct {
@@ -114,8 +116,20 @@ func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 	return nil
 }
 
+func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error) {
+	// claims, err := middleware.ValidateToken(token)
+	// if err != nil {
+	// 	return ctx, err
+	// }
+
+	// // Aggiungi i claims nel context, così puoi usarli nei tuoi handler
+	// ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
+
+	return ctx, nil
+}
+
 // Create crea un nuovo utente sia in Keycloak che nel database
-func (s *Service) Create(ctx context.Context, payload *userService.CreateUserPayload) (*userService.User, error) {
+func (s *Service) Create(ctx context.Context, payload *userService.CreatePayload) (*userService.User, error) {
 	// Creazione in Keycloak
 	userModel := User{
 		FirstName: payload.FirstName,
