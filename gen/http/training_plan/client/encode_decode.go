@@ -14,6 +14,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -38,9 +39,17 @@ func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, 
 // training_plan create server.
 func EncodeCreateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		p, ok := v.(*trainingplan.CreateTrainingPlanPayload)
+		p, ok := v.(*trainingplan.CreatePayload)
 		if !ok {
-			return goahttp.ErrInvalidType("training_plan", "create", "*trainingplan.CreateTrainingPlanPayload", v)
+			return goahttp.ErrInvalidType("training_plan", "create", "*trainingplan.CreatePayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
 		}
 		body := NewCreateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
@@ -115,6 +124,26 @@ func (c *Client) BuildGetRequest(ctx context.Context, v any) (*http.Request, err
 	return req, nil
 }
 
+// EncodeGetRequest returns an encoder for requests sent to the training_plan
+// get server.
+func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*trainingplan.GetPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("training_plan", "get", "*trainingplan.GetPayload", v)
+		}
+		{
+			head := p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
 // DecodeGetResponse returns a decoder for responses returned by the
 // training_plan get endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
@@ -168,6 +197,26 @@ func (c *Client) BuildListRequest(ctx context.Context, v any) (*http.Request, er
 	}
 
 	return req, nil
+}
+
+// EncodeListRequest returns an encoder for requests sent to the training_plan
+// list server.
+func EncodeListRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*trainingplan.ListPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("training_plan", "list", "*trainingplan.ListPayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
 }
 
 // DecodeListResponse returns a decoder for responses returned by the
@@ -249,6 +298,14 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		if !ok {
 			return goahttp.ErrInvalidType("training_plan", "update", "*trainingplan.UpdatePayload", v)
 		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
 		body := NewUpdateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
 			return goahttp.ErrEncodingError("training_plan", "update", err)
@@ -320,6 +377,26 @@ func (c *Client) BuildDeleteRequest(ctx context.Context, v any) (*http.Request, 
 	}
 
 	return req, nil
+}
+
+// EncodeDeleteRequest returns an encoder for requests sent to the
+// training_plan delete server.
+func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*trainingplan.DeletePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("training_plan", "delete", "*trainingplan.DeletePayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
 }
 
 // DecodeDeleteResponse returns a decoder for responses returned by the

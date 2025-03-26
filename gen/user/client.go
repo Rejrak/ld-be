@@ -40,7 +40,7 @@ func NewClient(create, get, list, update, delete_ goa.Endpoint) *Client {
 //   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
 //   - "badRequest" (type *BadRequest): Parametri non validi
 //   - error: internal error
-func (c *Client) Create(ctx context.Context, p *CreateUserPayload) (res *User, err error) {
+func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *User, err error) {
 	var ires any
 	ires, err = c.CreateEndpoint(ctx, p)
 	if err != nil {

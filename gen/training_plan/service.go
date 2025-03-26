@@ -9,20 +9,28 @@ package trainingplan
 
 import (
 	"context"
+
+	"goa.design/goa/v3/security"
 )
 
 // Service for managing training plans
 type Service interface {
 	// Create implements create.
-	Create(context.Context, *CreateTrainingPlanPayload) (res *TrainingPlan, err error)
+	Create(context.Context, *CreatePayload) (res *TrainingPlan, err error)
 	// Get implements get.
 	Get(context.Context, *GetPayload) (res *TrainingPlan, err error)
 	// List implements list.
-	List(context.Context) (res []*TrainingPlan, err error)
+	List(context.Context, *ListPayload) (res []*TrainingPlan, err error)
 	// Update implements update.
 	Update(context.Context, *UpdatePayload) (res *TrainingPlan, err error)
 	// Delete implements delete.
 	Delete(context.Context, *DeletePayload) (err error)
+}
+
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
+	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -57,9 +65,10 @@ type BadRequest struct {
 	Fault bool
 }
 
-// CreateTrainingPlanPayload is the payload type of the training_plan service
-// create method.
-type CreateTrainingPlanPayload struct {
+// CreatePayload is the payload type of the training_plan service create method.
+type CreatePayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// Name of the plan
 	Name string
 	// Description
@@ -71,11 +80,15 @@ type CreateTrainingPlanPayload struct {
 
 // DeletePayload is the payload type of the training_plan service delete method.
 type DeletePayload struct {
-	ID string
+	// OAuth2 access token used to perform authorization
+	Token *string
+	ID    string
 }
 
 // GetPayload is the payload type of the training_plan service get method.
 type GetPayload struct {
+	// OAuth2 access token used to perform authorization
+	Token string
 	// Training plan ID
 	ID string
 }
@@ -84,6 +97,12 @@ type GetPayload struct {
 type InternalServerError struct {
 	// Descrizione dell'errore
 	Message string
+}
+
+// ListPayload is the payload type of the training_plan service list method.
+type ListPayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 }
 
 // Dato non trovato all'interno del sistema
@@ -110,7 +129,9 @@ type TrainingPlan struct {
 
 // UpdatePayload is the payload type of the training_plan service update method.
 type UpdatePayload struct {
-	ID string
+	// OAuth2 access token used to perform authorization
+	Token *string
+	ID    string
 	// Name of the plan
 	Name string
 	// Description

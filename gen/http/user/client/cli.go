@@ -19,13 +19,18 @@ import (
 
 // BuildCreatePayload builds the payload for the user create endpoint from CLI
 // flags.
-func BuildCreatePayload(userCreateBody string) (*user.CreateUserPayload, error) {
+func BuildCreatePayload(userCreateBody string, userCreateToken string) (*user.CreatePayload, error) {
 	var err error
 	var body CreateRequestBody
 	{
 		err = json.Unmarshal([]byte(userCreateBody), &body)
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin\": false,\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"nickname\": \"JD\",\n      \"password\": \"Secret!1\"\n   }'")
+		}
+		if body.Nickname != nil {
+			if utf8.RuneCountInString(*body.Nickname) > 16 {
+				err = goa.MergeErrors(err, goa.InvalidLengthError("body.nickname", *body.Nickname, utf8.RuneCountInString(*body.Nickname), 16, false))
+			}
 		}
 		if body.Password != nil {
 			err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "^[a-zA-Z0-9!@#\\$%\\^&\\*\\(\\)_\\+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{6,}$"))
@@ -39,7 +44,13 @@ func BuildCreatePayload(userCreateBody string) (*user.CreateUserPayload, error) 
 			return nil, err
 		}
 	}
-	v := &user.CreateUserPayload{
+	var token *string
+	{
+		if userCreateToken != "" {
+			token = &userCreateToken
+		}
+	}
+	v := &user.CreatePayload{
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
 		Nickname:  body.Nickname,
@@ -52,12 +63,13 @@ func BuildCreatePayload(userCreateBody string) (*user.CreateUserPayload, error) 
 			v.Admin = false
 		}
 	}
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildGetPayload builds the payload for the user get endpoint from CLI flags.
-func BuildGetPayload(userGetID string) (*user.GetPayload, error) {
+func BuildGetPayload(userGetID string, userGetToken string) (*user.GetPayload, error) {
 	var err error
 	var id string
 	{
@@ -67,15 +79,22 @@ func BuildGetPayload(userGetID string) (*user.GetPayload, error) {
 			return nil, err
 		}
 	}
+	var token *string
+	{
+		if userGetToken != "" {
+			token = &userGetToken
+		}
+	}
 	v := &user.GetPayload{}
 	v.ID = id
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildListPayload builds the payload for the user list endpoint from CLI
 // flags.
-func BuildListPayload(userListLimit string, userListOffset string) (*user.ListPayload, error) {
+func BuildListPayload(userListLimit string, userListOffset string, userListToken string) (*user.ListPayload, error) {
 	var err error
 	var limit int
 	{
@@ -114,16 +133,23 @@ func BuildListPayload(userListLimit string, userListOffset string) (*user.ListPa
 			}
 		}
 	}
+	var token *string
+	{
+		if userListToken != "" {
+			token = &userListToken
+		}
+	}
 	v := &user.ListPayload{}
 	v.Limit = limit
 	v.Offset = offset
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildUpdatePayload builds the payload for the user update endpoint from CLI
 // flags.
-func BuildUpdatePayload(userUpdateBody string, userUpdateID string) (*user.UpdatePayload, error) {
+func BuildUpdatePayload(userUpdateBody string, userUpdateID string, userUpdateToken string) (*user.UpdatePayload, error) {
 	var err error
 	var body UpdateRequestBody
 	{
@@ -140,6 +166,12 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateID string) (*user.Updat
 			return nil, err
 		}
 	}
+	var token *string
+	{
+		if userUpdateToken != "" {
+			token = &userUpdateToken
+		}
+	}
 	v := &user.UpdatePayload{
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
@@ -153,13 +185,14 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateID string) (*user.Updat
 		}
 	}
 	v.ID = id
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildDeletePayload builds the payload for the user delete endpoint from CLI
 // flags.
-func BuildDeletePayload(userDeleteID string) (*user.DeletePayload, error) {
+func BuildDeletePayload(userDeleteID string, userDeleteToken string) (*user.DeletePayload, error) {
 	var err error
 	var id string
 	{
@@ -169,8 +202,15 @@ func BuildDeletePayload(userDeleteID string) (*user.DeletePayload, error) {
 			return nil, err
 		}
 	}
+	var token *string
+	{
+		if userDeleteToken != "" {
+			token = &userDeleteToken
+		}
+	}
 	v := &user.DeletePayload{}
 	v.ID = id
+	v.Token = token
 
 	return v, nil
 }

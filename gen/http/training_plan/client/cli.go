@@ -18,7 +18,7 @@ import (
 
 // BuildCreatePayload builds the payload for the training_plan create endpoint
 // from CLI flags.
-func BuildCreatePayload(trainingPlanCreateBody string) (*trainingplan.CreateTrainingPlanPayload, error) {
+func BuildCreatePayload(trainingPlanCreateBody string, trainingPlanCreateToken string) (*trainingplan.CreatePayload, error) {
 	var err error
 	var body CreateRequestBody
 	{
@@ -36,20 +36,27 @@ func BuildCreatePayload(trainingPlanCreateBody string) (*trainingplan.CreateTrai
 			return nil, err
 		}
 	}
-	v := &trainingplan.CreateTrainingPlanPayload{
+	var token *string
+	{
+		if trainingPlanCreateToken != "" {
+			token = &trainingPlanCreateToken
+		}
+	}
+	v := &trainingplan.CreatePayload{
 		Name:        body.Name,
 		Description: body.Description,
 		StartDate:   body.StartDate,
 		EndDate:     body.EndDate,
 		UserID:      body.UserID,
 	}
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildGetPayload builds the payload for the training_plan get endpoint from
 // CLI flags.
-func BuildGetPayload(trainingPlanGetID string) (*trainingplan.GetPayload, error) {
+func BuildGetPayload(trainingPlanGetID string, trainingPlanGetToken string) (*trainingplan.GetPayload, error) {
 	var err error
 	var id string
 	{
@@ -59,15 +66,35 @@ func BuildGetPayload(trainingPlanGetID string) (*trainingplan.GetPayload, error)
 			return nil, err
 		}
 	}
+	var token string
+	{
+		token = trainingPlanGetToken
+	}
 	v := &trainingplan.GetPayload{}
 	v.ID = id
+	v.Token = token
+
+	return v, nil
+}
+
+// BuildListPayload builds the payload for the training_plan list endpoint from
+// CLI flags.
+func BuildListPayload(trainingPlanListToken string) (*trainingplan.ListPayload, error) {
+	var token *string
+	{
+		if trainingPlanListToken != "" {
+			token = &trainingPlanListToken
+		}
+	}
+	v := &trainingplan.ListPayload{}
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildUpdatePayload builds the payload for the training_plan update endpoint
 // from CLI flags.
-func BuildUpdatePayload(trainingPlanUpdateBody string, trainingPlanUpdateID string) (*trainingplan.UpdatePayload, error) {
+func BuildUpdatePayload(trainingPlanUpdateBody string, trainingPlanUpdateID string, trainingPlanUpdateToken string) (*trainingplan.UpdatePayload, error) {
 	var err error
 	var body UpdateRequestBody
 	{
@@ -93,6 +120,12 @@ func BuildUpdatePayload(trainingPlanUpdateBody string, trainingPlanUpdateID stri
 			return nil, err
 		}
 	}
+	var token *string
+	{
+		if trainingPlanUpdateToken != "" {
+			token = &trainingPlanUpdateToken
+		}
+	}
 	v := &trainingplan.UpdatePayload{
 		Name:        body.Name,
 		Description: body.Description,
@@ -101,13 +134,14 @@ func BuildUpdatePayload(trainingPlanUpdateBody string, trainingPlanUpdateID stri
 		UserID:      body.UserID,
 	}
 	v.ID = id
+	v.Token = token
 
 	return v, nil
 }
 
 // BuildDeletePayload builds the payload for the training_plan delete endpoint
 // from CLI flags.
-func BuildDeletePayload(trainingPlanDeleteID string) (*trainingplan.DeletePayload, error) {
+func BuildDeletePayload(trainingPlanDeleteID string, trainingPlanDeleteToken string) (*trainingplan.DeletePayload, error) {
 	var err error
 	var id string
 	{
@@ -117,8 +151,15 @@ func BuildDeletePayload(trainingPlanDeleteID string) (*trainingplan.DeletePayloa
 			return nil, err
 		}
 	}
+	var token *string
+	{
+		if trainingPlanDeleteToken != "" {
+			token = &trainingPlanDeleteToken
+		}
+	}
 	v := &trainingplan.DeletePayload{}
 	v.ID = id
+	v.Token = token
 
 	return v, nil
 }

@@ -420,9 +420,9 @@ func NewDeleteUnauthorizedResponseBody(res *user.Unauthorized) *DeleteUnauthoriz
 	return body
 }
 
-// NewCreateUserPayload builds a user service create endpoint payload.
-func NewCreateUserPayload(body *CreateRequestBody) *user.CreateUserPayload {
-	v := &user.CreateUserPayload{
+// NewCreatePayload builds a user service create endpoint payload.
+func NewCreatePayload(body *CreateRequestBody, token *string) *user.CreatePayload {
+	v := &user.CreatePayload{
 		FirstName: *body.FirstName,
 		LastName:  *body.LastName,
 		Nickname:  body.Nickname,
@@ -434,29 +434,32 @@ func NewCreateUserPayload(body *CreateRequestBody) *user.CreateUserPayload {
 	if body.Admin == nil {
 		v.Admin = false
 	}
+	v.Token = token
 
 	return v
 }
 
 // NewGetPayload builds a user service get endpoint payload.
-func NewGetPayload(id string) *user.GetPayload {
+func NewGetPayload(id string, token *string) *user.GetPayload {
 	v := &user.GetPayload{}
 	v.ID = id
+	v.Token = token
 
 	return v
 }
 
 // NewListPayload builds a user service list endpoint payload.
-func NewListPayload(limit int, offset int) *user.ListPayload {
+func NewListPayload(limit int, offset int, token *string) *user.ListPayload {
 	v := &user.ListPayload{}
 	v.Limit = limit
 	v.Offset = offset
+	v.Token = token
 
 	return v
 }
 
 // NewUpdatePayload builds a user service update endpoint payload.
-func NewUpdatePayload(body *UpdateRequestBody, id string) *user.UpdatePayload {
+func NewUpdatePayload(body *UpdateRequestBody, id string, token *string) *user.UpdatePayload {
 	v := &user.UpdatePayload{
 		FirstName: *body.FirstName,
 		LastName:  *body.LastName,
@@ -469,14 +472,16 @@ func NewUpdatePayload(body *UpdateRequestBody, id string) *user.UpdatePayload {
 		v.Admin = false
 	}
 	v.ID = id
+	v.Token = token
 
 	return v
 }
 
 // NewDeletePayload builds a user service delete endpoint payload.
-func NewDeletePayload(id string) *user.DeletePayload {
+func NewDeletePayload(id string, token *string) *user.DeletePayload {
 	v := &user.DeletePayload{}
 	v.ID = id
+	v.Token = token
 
 	return v
 }
@@ -488,6 +493,11 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 	}
 	if body.LastName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("lastName", "body"))
+	}
+	if body.Nickname != nil {
+		if utf8.RuneCountInString(*body.Nickname) > 16 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.nickname", *body.Nickname, utf8.RuneCountInString(*body.Nickname), 16, false))
+		}
 	}
 	if body.Password != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "^[a-zA-Z0-9!@#\\$%\\^&\\*\\(\\)_\\+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{6,}$"))

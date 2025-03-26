@@ -161,30 +161,39 @@ func NewUpdateResponseBody(res *trainingplan.TrainingPlan) *UpdateResponseBody {
 	return body
 }
 
-// NewCreateTrainingPlanPayload builds a training_plan service create endpoint
-// payload.
-func NewCreateTrainingPlanPayload(body *CreateRequestBody) *trainingplan.CreateTrainingPlanPayload {
-	v := &trainingplan.CreateTrainingPlanPayload{
+// NewCreatePayload builds a training_plan service create endpoint payload.
+func NewCreatePayload(body *CreateRequestBody, token *string) *trainingplan.CreatePayload {
+	v := &trainingplan.CreatePayload{
 		Name:        *body.Name,
 		Description: body.Description,
 		StartDate:   *body.StartDate,
 		EndDate:     *body.EndDate,
 		UserID:      *body.UserID,
 	}
+	v.Token = token
 
 	return v
 }
 
 // NewGetPayload builds a training_plan service get endpoint payload.
-func NewGetPayload(id string) *trainingplan.GetPayload {
+func NewGetPayload(id string, token string) *trainingplan.GetPayload {
 	v := &trainingplan.GetPayload{}
 	v.ID = id
+	v.Token = token
+
+	return v
+}
+
+// NewListPayload builds a training_plan service list endpoint payload.
+func NewListPayload(token *string) *trainingplan.ListPayload {
+	v := &trainingplan.ListPayload{}
+	v.Token = token
 
 	return v
 }
 
 // NewUpdatePayload builds a training_plan service update endpoint payload.
-func NewUpdatePayload(body *UpdateRequestBody, id string) *trainingplan.UpdatePayload {
+func NewUpdatePayload(body *UpdateRequestBody, id string, token *string) *trainingplan.UpdatePayload {
 	v := &trainingplan.UpdatePayload{
 		Name:        *body.Name,
 		Description: body.Description,
@@ -193,14 +202,16 @@ func NewUpdatePayload(body *UpdateRequestBody, id string) *trainingplan.UpdatePa
 		UserID:      *body.UserID,
 	}
 	v.ID = id
+	v.Token = token
 
 	return v
 }
 
 // NewDeletePayload builds a training_plan service delete endpoint payload.
-func NewDeletePayload(id string) *trainingplan.DeletePayload {
+func NewDeletePayload(id string, token *string) *trainingplan.DeletePayload {
 	v := &trainingplan.DeletePayload{}
 	v.ID = id
+	v.Token = token
 
 	return v
 }

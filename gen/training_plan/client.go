@@ -39,7 +39,7 @@ func NewClient(create, get, list, update, delete_ goa.Endpoint) *Client {
 //   - "internalServerError" (type *InternalServerError)
 //   - "badRequest" (type *BadRequest)
 //   - error: internal error
-func (c *Client) Create(ctx context.Context, p *CreateTrainingPlanPayload) (res *TrainingPlan, err error) {
+func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *TrainingPlan, err error) {
 	var ires any
 	ires, err = c.CreateEndpoint(ctx, p)
 	if err != nil {
@@ -69,9 +69,9 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *TrainingPlan, err
 //   - "internalServerError" (type *InternalServerError)
 //   - "badRequest" (type *BadRequest)
 //   - error: internal error
-func (c *Client) List(ctx context.Context) (res []*TrainingPlan, err error) {
+func (c *Client) List(ctx context.Context, p *ListPayload) (res []*TrainingPlan, err error) {
 	var ires any
-	ires, err = c.ListEndpoint(ctx, nil)
+	ires, err = c.ListEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

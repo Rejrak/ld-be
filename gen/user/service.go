@@ -9,12 +9,14 @@ package user
 
 import (
 	"context"
+
+	"goa.design/goa/v3/security"
 )
 
 // User service for managing users
 type Service interface {
 	// Create a new user
-	Create(context.Context, *CreateUserPayload) (res *User, err error)
+	Create(context.Context, *CreatePayload) (res *User, err error)
 	// Get a user by ID
 	Get(context.Context, *GetPayload) (res *User, err error)
 	// List all users with pagination
@@ -23,6 +25,12 @@ type Service interface {
 	Update(context.Context, *UpdatePayload) (res *User, err error)
 	// Delete a user
 	Delete(context.Context, *DeletePayload) (err error)
+}
+
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
+	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -57,8 +65,10 @@ type BadRequest struct {
 	Fault bool
 }
 
-// CreateUserPayload is the payload type of the user service create method.
-type CreateUserPayload struct {
+// CreatePayload is the payload type of the user service create method.
+type CreatePayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// First name
 	FirstName string
 	// Last name
@@ -73,12 +83,16 @@ type CreateUserPayload struct {
 
 // DeletePayload is the payload type of the user service delete method.
 type DeletePayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// User ID
 	ID string
 }
 
 // GetPayload is the payload type of the user service get method.
 type GetPayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// User ID
 	ID string
 }
@@ -91,6 +105,8 @@ type InternalServerError struct {
 
 // ListPayload is the payload type of the user service list method.
 type ListPayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// Number of users to return per page
 	Limit int
 	// Number of users to skip
@@ -111,6 +127,8 @@ type Unauthorized struct {
 
 // UpdatePayload is the payload type of the user service update method.
 type UpdatePayload struct {
+	// OAuth2 access token used to perform authorization
+	Token *string
 	// User ID
 	ID string
 	// First name

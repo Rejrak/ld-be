@@ -110,7 +110,7 @@ type TrainingPlanResponse struct {
 
 // NewCreateRequestBody builds the HTTP request body from the payload of the
 // "create" endpoint of the "training_plan" service.
-func NewCreateRequestBody(p *trainingplan.CreateTrainingPlanPayload) *CreateRequestBody {
+func NewCreateRequestBody(p *trainingplan.CreatePayload) *CreateRequestBody {
 	body := &CreateRequestBody{
 		Name:        p.Name,
 		Description: p.Description,

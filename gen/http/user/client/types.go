@@ -228,7 +228,7 @@ type UserResponse struct {
 
 // NewCreateRequestBody builds the HTTP request body from the payload of the
 // "create" endpoint of the "user" service.
-func NewCreateRequestBody(p *user.CreateUserPayload) *CreateRequestBody {
+func NewCreateRequestBody(p *user.CreatePayload) *CreateRequestBody {
 	body := &CreateRequestBody{
 		FirstName: p.FirstName,
 		LastName:  p.LastName,

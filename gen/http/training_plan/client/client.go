@@ -94,10 +94,15 @@ func (c *Client) Create() goa.Endpoint {
 // service get server.
 func (c *Client) Get() goa.Endpoint {
 	var (
+		encodeRequest  = EncodeGetRequest(c.encoder)
 		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
 		req, err := c.BuildGetRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}
@@ -113,10 +118,15 @@ func (c *Client) Get() goa.Endpoint {
 // service list server.
 func (c *Client) List() goa.Endpoint {
 	var (
+		encodeRequest  = EncodeListRequest(c.encoder)
 		decodeResponse = DecodeListResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
 		req, err := c.BuildListRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}
@@ -156,10 +166,15 @@ func (c *Client) Update() goa.Endpoint {
 // service delete server.
 func (c *Client) Delete() goa.Endpoint {
 	var (
+		encodeRequest  = EncodeDeleteRequest(c.encoder)
 		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
 		req, err := c.BuildDeleteRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}

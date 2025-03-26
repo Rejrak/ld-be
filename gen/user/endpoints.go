@@ -11,6 +11,7 @@ import (
 	"context"
 
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/goa/v3/security"
 )
 
 // Endpoints wraps the "user" service endpoints.
@@ -24,12 +25,14 @@ type Endpoints struct {
 
 // NewEndpoints wraps the methods of the "user" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
+	// Casting service to Auther interface
+	a := s.(Auther)
 	return &Endpoints{
-		Create: NewCreateEndpoint(s),
-		Get:    NewGetEndpoint(s),
-		List:   NewListEndpoint(s),
-		Update: NewUpdateEndpoint(s),
-		Delete: NewDeleteEndpoint(s),
+		Create: NewCreateEndpoint(s, a.OAuth2Auth),
+		Get:    NewGetEndpoint(s, a.OAuth2Auth),
+		List:   NewListEndpoint(s, a.OAuth2Auth),
+		Update: NewUpdateEndpoint(s, a.OAuth2Auth),
+		Delete: NewDeleteEndpoint(s, a.OAuth2Auth),
 	}
 }
 
@@ -44,45 +47,150 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 
 // NewCreateEndpoint returns an endpoint function that calls the method
 // "create" of service "user".
-func NewCreateEndpoint(s Service) goa.Endpoint {
+func NewCreateEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		p := req.(*CreateUserPayload)
+		p := req.(*CreatePayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "oauth2",
+			Scopes:         []string{"openid"},
+			RequiredScopes: []string{"openid"},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:             "authorization_code",
+					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
+					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+				},
+			},
+		}
+		var token string
+		if p.Token != nil {
+			token = *p.Token
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
 		return s.Create(ctx, p)
 	}
 }
 
 // NewGetEndpoint returns an endpoint function that calls the method "get" of
 // service "user".
-func NewGetEndpoint(s Service) goa.Endpoint {
+func NewGetEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*GetPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "oauth2",
+			Scopes:         []string{"openid"},
+			RequiredScopes: []string{"openid"},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:             "authorization_code",
+					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
+					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+				},
+			},
+		}
+		var token string
+		if p.Token != nil {
+			token = *p.Token
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
 		return s.Get(ctx, p)
 	}
 }
 
 // NewListEndpoint returns an endpoint function that calls the method "list" of
 // service "user".
-func NewListEndpoint(s Service) goa.Endpoint {
+func NewListEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*ListPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "oauth2",
+			Scopes:         []string{"openid"},
+			RequiredScopes: []string{"openid"},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:             "authorization_code",
+					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
+					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+				},
+			},
+		}
+		var token string
+		if p.Token != nil {
+			token = *p.Token
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
 		return s.List(ctx, p)
 	}
 }
 
 // NewUpdateEndpoint returns an endpoint function that calls the method
 // "update" of service "user".
-func NewUpdateEndpoint(s Service) goa.Endpoint {
+func NewUpdateEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*UpdatePayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "oauth2",
+			Scopes:         []string{"openid"},
+			RequiredScopes: []string{"openid"},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:             "authorization_code",
+					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
+					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+				},
+			},
+		}
+		var token string
+		if p.Token != nil {
+			token = *p.Token
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
 		return s.Update(ctx, p)
 	}
 }
 
 // NewDeleteEndpoint returns an endpoint function that calls the method
 // "delete" of service "user".
-func NewDeleteEndpoint(s Service) goa.Endpoint {
+func NewDeleteEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*DeletePayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "oauth2",
+			Scopes:         []string{"openid"},
+			RequiredScopes: []string{"openid"},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:             "authorization_code",
+					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
+					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+				},
+			},
+		}
+		var token string
+		if p.Token != nil {
+			token = *p.Token
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
 		return nil, s.Delete(ctx, p)
 	}
 }

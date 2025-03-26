@@ -36,14 +36,14 @@ func UsageExamples() string {
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }'` + "\n" +
+   }' --token "Debitis deserunt doloremque temporibus."` + "\n" +
 		os.Args[0] + ` user create --body '{
       "admin": false,
       "firstName": "John",
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
-   }'` + "\n" +
+   }' --token "Et voluptatum hic et et sapiente quia."` + "\n" +
 		""
 }
 
@@ -59,39 +59,49 @@ func ParseEndpoint(
 	var (
 		trainingPlanFlags = flag.NewFlagSet("training-plan", flag.ContinueOnError)
 
-		trainingPlanCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
-		trainingPlanCreateBodyFlag = trainingPlanCreateFlags.String("body", "REQUIRED", "")
+		trainingPlanCreateFlags     = flag.NewFlagSet("create", flag.ExitOnError)
+		trainingPlanCreateBodyFlag  = trainingPlanCreateFlags.String("body", "REQUIRED", "")
+		trainingPlanCreateTokenFlag = trainingPlanCreateFlags.String("token", "", "")
 
-		trainingPlanGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
-		trainingPlanGetIDFlag = trainingPlanGetFlags.String("id", "REQUIRED", "Training plan ID")
+		trainingPlanGetFlags     = flag.NewFlagSet("get", flag.ExitOnError)
+		trainingPlanGetIDFlag    = trainingPlanGetFlags.String("id", "REQUIRED", "Training plan ID")
+		trainingPlanGetTokenFlag = trainingPlanGetFlags.String("token", "REQUIRED", "")
 
-		trainingPlanListFlags = flag.NewFlagSet("list", flag.ExitOnError)
+		trainingPlanListFlags     = flag.NewFlagSet("list", flag.ExitOnError)
+		trainingPlanListTokenFlag = trainingPlanListFlags.String("token", "", "")
 
-		trainingPlanUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
-		trainingPlanUpdateBodyFlag = trainingPlanUpdateFlags.String("body", "REQUIRED", "")
-		trainingPlanUpdateIDFlag   = trainingPlanUpdateFlags.String("id", "REQUIRED", "")
+		trainingPlanUpdateFlags     = flag.NewFlagSet("update", flag.ExitOnError)
+		trainingPlanUpdateBodyFlag  = trainingPlanUpdateFlags.String("body", "REQUIRED", "")
+		trainingPlanUpdateIDFlag    = trainingPlanUpdateFlags.String("id", "REQUIRED", "")
+		trainingPlanUpdateTokenFlag = trainingPlanUpdateFlags.String("token", "", "")
 
-		trainingPlanDeleteFlags  = flag.NewFlagSet("delete", flag.ExitOnError)
-		trainingPlanDeleteIDFlag = trainingPlanDeleteFlags.String("id", "REQUIRED", "")
+		trainingPlanDeleteFlags     = flag.NewFlagSet("delete", flag.ExitOnError)
+		trainingPlanDeleteIDFlag    = trainingPlanDeleteFlags.String("id", "REQUIRED", "")
+		trainingPlanDeleteTokenFlag = trainingPlanDeleteFlags.String("token", "", "")
 
 		userFlags = flag.NewFlagSet("user", flag.ContinueOnError)
 
-		userCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
-		userCreateBodyFlag = userCreateFlags.String("body", "REQUIRED", "")
+		userCreateFlags     = flag.NewFlagSet("create", flag.ExitOnError)
+		userCreateBodyFlag  = userCreateFlags.String("body", "REQUIRED", "")
+		userCreateTokenFlag = userCreateFlags.String("token", "", "")
 
-		userGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
-		userGetIDFlag = userGetFlags.String("id", "REQUIRED", "User ID")
+		userGetFlags     = flag.NewFlagSet("get", flag.ExitOnError)
+		userGetIDFlag    = userGetFlags.String("id", "REQUIRED", "User ID")
+		userGetTokenFlag = userGetFlags.String("token", "", "")
 
 		userListFlags      = flag.NewFlagSet("list", flag.ExitOnError)
 		userListLimitFlag  = userListFlags.String("limit", "10", "")
 		userListOffsetFlag = userListFlags.String("offset", "", "")
+		userListTokenFlag  = userListFlags.String("token", "", "")
 
-		userUpdateFlags    = flag.NewFlagSet("update", flag.ExitOnError)
-		userUpdateBodyFlag = userUpdateFlags.String("body", "REQUIRED", "")
-		userUpdateIDFlag   = userUpdateFlags.String("id", "REQUIRED", "User ID")
+		userUpdateFlags     = flag.NewFlagSet("update", flag.ExitOnError)
+		userUpdateBodyFlag  = userUpdateFlags.String("body", "REQUIRED", "")
+		userUpdateIDFlag    = userUpdateFlags.String("id", "REQUIRED", "User ID")
+		userUpdateTokenFlag = userUpdateFlags.String("token", "", "")
 
-		userDeleteFlags  = flag.NewFlagSet("delete", flag.ExitOnError)
-		userDeleteIDFlag = userDeleteFlags.String("id", "REQUIRED", "User ID")
+		userDeleteFlags     = flag.NewFlagSet("delete", flag.ExitOnError)
+		userDeleteIDFlag    = userDeleteFlags.String("id", "REQUIRED", "User ID")
+		userDeleteTokenFlag = userDeleteFlags.String("token", "", "")
 	)
 	trainingPlanFlags.Usage = trainingPlanUsage
 	trainingPlanCreateFlags.Usage = trainingPlanCreateUsage
@@ -204,37 +214,38 @@ func ParseEndpoint(
 			switch epn {
 			case "create":
 				endpoint = c.Create()
-				data, err = trainingplanc.BuildCreatePayload(*trainingPlanCreateBodyFlag)
+				data, err = trainingplanc.BuildCreatePayload(*trainingPlanCreateBodyFlag, *trainingPlanCreateTokenFlag)
 			case "get":
 				endpoint = c.Get()
-				data, err = trainingplanc.BuildGetPayload(*trainingPlanGetIDFlag)
+				data, err = trainingplanc.BuildGetPayload(*trainingPlanGetIDFlag, *trainingPlanGetTokenFlag)
 			case "list":
 				endpoint = c.List()
+				data, err = trainingplanc.BuildListPayload(*trainingPlanListTokenFlag)
 			case "update":
 				endpoint = c.Update()
-				data, err = trainingplanc.BuildUpdatePayload(*trainingPlanUpdateBodyFlag, *trainingPlanUpdateIDFlag)
+				data, err = trainingplanc.BuildUpdatePayload(*trainingPlanUpdateBodyFlag, *trainingPlanUpdateIDFlag, *trainingPlanUpdateTokenFlag)
 			case "delete":
 				endpoint = c.Delete()
-				data, err = trainingplanc.BuildDeletePayload(*trainingPlanDeleteIDFlag)
+				data, err = trainingplanc.BuildDeletePayload(*trainingPlanDeleteIDFlag, *trainingPlanDeleteTokenFlag)
 			}
 		case "user":
 			c := userc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
 			case "create":
 				endpoint = c.Create()
-				data, err = userc.BuildCreatePayload(*userCreateBodyFlag)
+				data, err = userc.BuildCreatePayload(*userCreateBodyFlag, *userCreateTokenFlag)
 			case "get":
 				endpoint = c.Get()
-				data, err = userc.BuildGetPayload(*userGetIDFlag)
+				data, err = userc.BuildGetPayload(*userGetIDFlag, *userGetTokenFlag)
 			case "list":
 				endpoint = c.List()
-				data, err = userc.BuildListPayload(*userListLimitFlag, *userListOffsetFlag)
+				data, err = userc.BuildListPayload(*userListLimitFlag, *userListOffsetFlag, *userListTokenFlag)
 			case "update":
 				endpoint = c.Update()
-				data, err = userc.BuildUpdatePayload(*userUpdateBodyFlag, *userUpdateIDFlag)
+				data, err = userc.BuildUpdatePayload(*userUpdateBodyFlag, *userUpdateIDFlag, *userUpdateTokenFlag)
 			case "delete":
 				endpoint = c.Delete()
-				data, err = userc.BuildDeletePayload(*userDeleteIDFlag)
+				data, err = userc.BuildDeletePayload(*userDeleteIDFlag, *userDeleteTokenFlag)
 			}
 		}
 	}
@@ -264,10 +275,11 @@ Additional help:
 `, os.Args[0])
 }
 func trainingPlanCreateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan create -body JSON
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan create -body JSON -token STRING
 
 Create implements create.
     -body JSON: 
+    -token STRING: 
 
 Example:
     %[1]s training-plan create --body '{
@@ -276,37 +288,40 @@ Example:
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }'
+   }' --token "Debitis deserunt doloremque temporibus."
 `, os.Args[0])
 }
 
 func trainingPlanGetUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan get -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan get -id STRING -token STRING
 
 Get implements get.
     -id STRING: Training plan ID
+    -token STRING: 
 
 Example:
-    %[1]s training-plan get --id "6887f57a-4398-4354-9693-f5a954d06696"
+    %[1]s training-plan get --id "e366361a-8f76-4aa0-a235-58299e749f0b" --token "Et suscipit et nam aut."
 `, os.Args[0])
 }
 
 func trainingPlanListUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan list
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan list -token STRING
 
 List implements list.
+    -token STRING: 
 
 Example:
-    %[1]s training-plan list
+    %[1]s training-plan list --token "Laborum voluptatem iusto neque."
 `, os.Args[0])
 }
 
 func trainingPlanUpdateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan update -body JSON -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan update -body JSON -id STRING -token STRING
 
 Update implements update.
     -body JSON: 
     -id STRING: 
+    -token STRING: 
 
 Example:
     %[1]s training-plan update --body '{
@@ -315,18 +330,19 @@ Example:
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }' --id "db8644bd-ab69-4870-af7b-67f489e237e2"
+   }' --id "998eec70-130e-4cd6-8377-2c474051e173" --token "Repellendus autem in totam ipsum assumenda qui."
 `, os.Args[0])
 }
 
 func trainingPlanDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan delete -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan delete -id STRING -token STRING
 
 Delete implements delete.
     -id STRING: 
+    -token STRING: 
 
 Example:
-    %[1]s training-plan delete --id "a88cc9f1-a9d0-482e-beda-45aea9d97b6c"
+    %[1]s training-plan delete --id "66be7108-6e8a-4dcf-8103-408675ac950a" --token "Facilis aut consequatur."
 `, os.Args[0])
 }
 
@@ -348,10 +364,11 @@ Additional help:
 `, os.Args[0])
 }
 func userCreateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user create -body JSON
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user create -body JSON -token STRING
 
 Create a new user
     -body JSON: 
+    -token STRING: 
 
 Example:
     %[1]s user create --body '{
@@ -360,39 +377,42 @@ Example:
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
-   }'
+   }' --token "Et voluptatum hic et et sapiente quia."
 `, os.Args[0])
 }
 
 func userGetUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user get -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user get -id STRING -token STRING
 
 Get a user by ID
     -id STRING: User ID
+    -token STRING: 
 
 Example:
-    %[1]s user get --id "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    %[1]s user get --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Tempora deleniti."
 `, os.Args[0])
 }
 
 func userListUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user list -limit INT -offset INT
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user list -limit INT -offset INT -token STRING
 
 List all users with pagination
     -limit INT: 
     -offset INT: 
+    -token STRING: 
 
 Example:
-    %[1]s user list --limit 10 --offset 0
+    %[1]s user list --limit 10 --offset 0 --token "Quos nisi reiciendis."
 `, os.Args[0])
 }
 
 func userUpdateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user update -body JSON -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user update -body JSON -id STRING -token STRING
 
 Update a user
     -body JSON: 
     -id STRING: User ID
+    -token STRING: 
 
 Example:
     %[1]s user update --body '{
@@ -400,17 +420,18 @@ Example:
       "firstName": "John",
       "lastName": "Doe",
       "nickname": "JD"
-   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Quam molestias consequatur voluptatem laudantium."
 `, os.Args[0])
 }
 
 func userDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] user delete -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] user delete -id STRING -token STRING
 
 Delete a user
     -id STRING: User ID
+    -token STRING: 
 
 Example:
-    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Minus et eveniet commodi ipsa voluptas."
 `, os.Args[0])
 }

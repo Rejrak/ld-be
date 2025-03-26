@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -39,9 +40,17 @@ func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, 
 // server.
 func EncodeCreateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		p, ok := v.(*user.CreateUserPayload)
+		p, ok := v.(*user.CreatePayload)
 		if !ok {
-			return goahttp.ErrInvalidType("user", "create", "*user.CreateUserPayload", v)
+			return goahttp.ErrInvalidType("user", "create", "*user.CreatePayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
 		}
 		body := NewCreateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
@@ -114,6 +123,25 @@ func (c *Client) BuildGetRequest(ctx context.Context, v any) (*http.Request, err
 	}
 
 	return req, nil
+}
+
+// EncodeGetRequest returns an encoder for requests sent to the user get server.
+func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*user.GetPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "get", "*user.GetPayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
 }
 
 // DecodeGetResponse returns a decoder for responses returned by the user get
@@ -241,6 +269,14 @@ func EncodeListRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 		if !ok {
 			return goahttp.ErrInvalidType("user", "list", "*user.ListPayload", v)
 		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
 		values := req.URL.Query()
 		values.Add("limit", fmt.Sprintf("%v", p.Limit))
 		values.Add("offset", fmt.Sprintf("%v", p.Offset))
@@ -327,6 +363,14 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		p, ok := v.(*user.UpdatePayload)
 		if !ok {
 			return goahttp.ErrInvalidType("user", "update", "*user.UpdatePayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
 		}
 		body := NewUpdateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
@@ -461,6 +505,26 @@ func (c *Client) BuildDeleteRequest(ctx context.Context, v any) (*http.Request, 
 	}
 
 	return req, nil
+}
+
+// EncodeDeleteRequest returns an encoder for requests sent to the user delete
+// server.
+func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*user.DeletePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "delete", "*user.DeletePayload", v)
+		}
+		if p.Token != nil {
+			head := *p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
 }
 
 // DecodeDeleteResponse returns a decoder for responses returned by the user
