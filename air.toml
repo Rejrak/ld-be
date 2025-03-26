@@ -12,7 +12,7 @@ cmd = "go build -buildvcs=false -o /opt/app/tmp/main /opt/app/cmd/be"
 bin = "/opt/app/tmp/main"
 
 # Imposta le variabili d’ambiente e avvia il backend
-full_bin = "BE_HOST=0.0.0.0 BE_PORT=9090 DB_HOST=postgres DB_USER=be_root DB_PASS=be_password DB_NAME=be DB_PORT=5432 /opt/app/tmp/main"
+# full_bin = "BE_HOST=0.0.0.0 BE_PORT=9090 DB_HOST=postgres DB_USER=be_root DB_PASS=be_password DB_NAME=be DB_PORT=5432 /opt/app/tmp/main"
 
 # File e directory da monitorare
 include_ext = ["go", "tpl", "tmpl", "html"]
