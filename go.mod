@@ -16,6 +16,11 @@ require (
 )
 
 require (
+	github.com/goadesign/goa v2.2.5+incompatible // indirect
+	github.com/gohugoio/hashstructure v0.5.0 // indirect
+)
+
+require (
 	github.com/aws/smithy-go v1.20.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598 // indirect
@@ -23,6 +28,7 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
+	github.com/goadesign/oauth2 v0.0.0-20170412180715-b0099d2c1bfa
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -39,6 +45,7 @@ require (
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
+	goa.design/goa v2.2.5+incompatible
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
