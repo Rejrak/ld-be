@@ -40,7 +40,6 @@ func UsageExamples() string {
 		os.Args[0] + ` user create --body '{
       "admin": false,
       "firstName": "John",
-      "kcId": "550e8400-e29b-41d4-a716-446655440000",
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
@@ -358,7 +357,6 @@ Example:
     %[1]s user create --body '{
       "admin": false,
       "firstName": "John",
-      "kcId": "550e8400-e29b-41d4-a716-446655440000",
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
@@ -400,7 +398,6 @@ Example:
     %[1]s user update --body '{
       "admin": false,
       "firstName": "John",
-      "kcId": "550e8400-e29b-41d4-a716-446655440000",
       "lastName": "Doe",
       "nickname": "JD"
    }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479"

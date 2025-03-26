@@ -16,8 +16,6 @@ import (
 // CreateRequestBody is the type of the "user" service "create" endpoint HTTP
 // request body.
 type CreateRequestBody struct {
-	// Keycloak ID
-	KcID string `form:"kcId" json:"kcId" xml:"kcId"`
 	// First name
 	FirstName string `form:"firstName" json:"firstName" xml:"firstName"`
 	// Last name
@@ -33,8 +31,6 @@ type CreateRequestBody struct {
 // UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
 // request body.
 type UpdateRequestBody struct {
-	// Keycloak ID
-	KcID string `form:"kcId" json:"kcId" xml:"kcId"`
 	// First name
 	FirstName string `form:"firstName" json:"firstName" xml:"firstName"`
 	// Last name
@@ -234,7 +230,6 @@ type UserResponse struct {
 // "create" endpoint of the "user" service.
 func NewCreateRequestBody(p *user.CreateUserPayload) *CreateRequestBody {
 	body := &CreateRequestBody{
-		KcID:      p.KcID,
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
 		Nickname:  p.Nickname,
@@ -254,7 +249,6 @@ func NewCreateRequestBody(p *user.CreateUserPayload) *CreateRequestBody {
 // "update" endpoint of the "user" service.
 func NewUpdateRequestBody(p *user.UpdatePayload) *UpdateRequestBody {
 	body := &UpdateRequestBody{
-		KcID:      p.KcID,
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
 		Nickname:  p.Nickname,

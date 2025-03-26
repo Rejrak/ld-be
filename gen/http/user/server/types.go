@@ -17,8 +17,6 @@ import (
 // CreateRequestBody is the type of the "user" service "create" endpoint HTTP
 // request body.
 type CreateRequestBody struct {
-	// Keycloak ID
-	KcID *string `form:"kcId,omitempty" json:"kcId,omitempty" xml:"kcId,omitempty"`
 	// First name
 	FirstName *string `form:"firstName,omitempty" json:"firstName,omitempty" xml:"firstName,omitempty"`
 	// Last name
@@ -34,8 +32,6 @@ type CreateRequestBody struct {
 // UpdateRequestBody is the type of the "user" service "update" endpoint HTTP
 // request body.
 type UpdateRequestBody struct {
-	// Keycloak ID
-	KcID *string `form:"kcId,omitempty" json:"kcId,omitempty" xml:"kcId,omitempty"`
 	// First name
 	FirstName *string `form:"firstName,omitempty" json:"firstName,omitempty" xml:"firstName,omitempty"`
 	// Last name
@@ -427,7 +423,6 @@ func NewDeleteUnauthorizedResponseBody(res *user.Unauthorized) *DeleteUnauthoriz
 // NewCreateUserPayload builds a user service create endpoint payload.
 func NewCreateUserPayload(body *CreateRequestBody) *user.CreateUserPayload {
 	v := &user.CreateUserPayload{
-		KcID:      *body.KcID,
 		FirstName: *body.FirstName,
 		LastName:  *body.LastName,
 		Nickname:  body.Nickname,
@@ -463,7 +458,6 @@ func NewListPayload(limit int, offset int) *user.ListPayload {
 // NewUpdatePayload builds a user service update endpoint payload.
 func NewUpdatePayload(body *UpdateRequestBody, id string) *user.UpdatePayload {
 	v := &user.UpdatePayload{
-		KcID:      *body.KcID,
 		FirstName: *body.FirstName,
 		LastName:  *body.LastName,
 		Nickname:  body.Nickname,
@@ -489,17 +483,11 @@ func NewDeletePayload(id string) *user.DeletePayload {
 
 // ValidateCreateRequestBody runs the validations defined on CreateRequestBody
 func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
-	if body.KcID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("kcId", "body"))
-	}
 	if body.FirstName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("firstName", "body"))
 	}
 	if body.LastName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("lastName", "body"))
-	}
-	if body.KcID != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.kcId", *body.KcID, goa.FormatUUID))
 	}
 	if body.Password != nil {
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "^[a-zA-Z0-9!@#\\$%\\^&\\*\\(\\)_\\+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{6,}$"))
@@ -514,17 +502,11 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 
 // ValidateUpdateRequestBody runs the validations defined on UpdateRequestBody
 func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
-	if body.KcID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("kcId", "body"))
-	}
 	if body.FirstName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("firstName", "body"))
 	}
 	if body.LastName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("lastName", "body"))
-	}
-	if body.KcID != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.kcId", *body.KcID, goa.FormatUUID))
 	}
 	return
 }

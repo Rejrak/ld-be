@@ -25,9 +25,8 @@ func BuildCreatePayload(userCreateBody string) (*user.CreateUserPayload, error) 
 	{
 		err = json.Unmarshal([]byte(userCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin\": false,\n      \"firstName\": \"John\",\n      \"kcId\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"lastName\": \"Doe\",\n      \"nickname\": \"JD\",\n      \"password\": \"Secret!1\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin\": false,\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"nickname\": \"JD\",\n      \"password\": \"Secret!1\"\n   }'")
 		}
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.kcId", body.KcID, goa.FormatUUID))
 		if body.Password != nil {
 			err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "^[a-zA-Z0-9!@#\\$%\\^&\\*\\(\\)_\\+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]{6,}$"))
 		}
@@ -41,7 +40,6 @@ func BuildCreatePayload(userCreateBody string) (*user.CreateUserPayload, error) 
 		}
 	}
 	v := &user.CreateUserPayload{
-		KcID:      body.KcID,
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
 		Nickname:  body.Nickname,
@@ -131,11 +129,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateID string) (*user.Updat
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin\": false,\n      \"firstName\": \"John\",\n      \"kcId\": \"550e8400-e29b-41d4-a716-446655440000\",\n      \"lastName\": \"Doe\",\n      \"nickname\": \"JD\"\n   }'")
-		}
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.kcId", body.KcID, goa.FormatUUID))
-		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin\": false,\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"nickname\": \"JD\"\n   }'")
 		}
 	}
 	var id string
@@ -147,7 +141,6 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateID string) (*user.Updat
 		}
 	}
 	v := &user.UpdatePayload{
-		KcID:      body.KcID,
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
 		Nickname:  body.Nickname,

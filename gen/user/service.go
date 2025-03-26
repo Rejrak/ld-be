@@ -59,8 +59,6 @@ type BadRequest struct {
 
 // CreateUserPayload is the payload type of the user service create method.
 type CreateUserPayload struct {
-	// Keycloak ID
-	KcID string
 	// First name
 	FirstName string
 	// Last name
@@ -115,8 +113,6 @@ type Unauthorized struct {
 type UpdatePayload struct {
 	// User ID
 	ID string
-	// Keycloak ID
-	KcID string
 	// First name
 	FirstName string
 	// Last name
