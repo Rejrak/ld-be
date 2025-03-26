@@ -32,10 +32,6 @@ var User = Type("User", func() {
 })
 
 var CreateUserPayload = Type("CreateUserPayload", func() {
-	Attribute("kcId", String, "Keycloak ID", func() {
-		Example("550e8400-e29b-41d4-a716-446655440000")
-		Format(FormatUUID)
-	})
 	Attribute("firstName", String, "First name", func() {
 		Example("John")
 	})
@@ -55,7 +51,7 @@ var CreateUserPayload = Type("CreateUserPayload", func() {
 		Default(false)
 		Example(false)
 	})
-	Required("kcId", "firstName", "lastName")
+	Required("firstName", "lastName")
 })
 
 var UserService = Service("user", func() {
@@ -128,10 +124,6 @@ var UserService = Service("user", func() {
 				Example("f47ac10b-58cc-4372-a567-0e02b2c3d479")
 				Format(FormatUUID)
 			})
-			Attribute("kcId", String, "Keycloak ID", func() {
-				Example("550e8400-e29b-41d4-a716-446655440000")
-				Format(FormatUUID)
-			})
 			Attribute("firstName", String, "First name", func() {
 				Example("John")
 			})
@@ -145,7 +137,7 @@ var UserService = Service("user", func() {
 				Default(false)
 				Example(false)
 			})
-			Required("id", "kcId", "firstName", "lastName")
+			Required("id", "firstName", "lastName")
 		})
 		Result(User)
 		HTTP(func() {
