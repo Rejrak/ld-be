@@ -1,4 +1,4 @@
-package services
+package design
 
 import (
 	"be/design/errors"
@@ -56,6 +56,9 @@ var CreateTrainingPlanPayload = Type("CreateTrainingPlanPayload", func() {
 })
 
 var TrainingPlanService = Service("training_plan", func() {
+	Security(OAuth2, func() {
+		Scope("openid")
+	})
 	Description("Service for managing training plans")
 
 	HTTP(func() {
@@ -67,7 +70,10 @@ var TrainingPlanService = Service("training_plan", func() {
 	Error("badRequest", errors.BadRequest)
 
 	Method("create", func() {
-		Payload(CreateTrainingPlanPayload)
+		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
+			Extend(CreateTrainingPlanPayload)
+		})
 		Result(TrainingPlan)
 		HTTP(func() {
 			POST("")
@@ -77,10 +83,12 @@ var TrainingPlanService = Service("training_plan", func() {
 
 	Method("get", func() {
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
+
 			Field(1, "id", String, "Training plan ID", func() {
 				Format(FormatUUID)
 			})
-			Required("id")
+			Required("id", "token")
 		})
 		Result(TrainingPlan)
 		HTTP(func() {
@@ -90,6 +98,9 @@ var TrainingPlanService = Service("training_plan", func() {
 	})
 
 	Method("list", func() {
+		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
+		})
 		Result(ArrayOf(TrainingPlan))
 		HTTP(func() {
 			GET("")
@@ -99,6 +110,7 @@ var TrainingPlanService = Service("training_plan", func() {
 
 	Method("update", func() {
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Attribute("id", String, func() {
 				Format(FormatUUID)
 			})
@@ -114,6 +126,7 @@ var TrainingPlanService = Service("training_plan", func() {
 
 	Method("delete", func() {
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Field(1, "id", String, func() {
 				Format(FormatUUID)
 			})

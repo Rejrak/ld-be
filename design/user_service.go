@@ -1,4 +1,4 @@
-package services
+package design
 
 import (
 	"be/design/errors"
@@ -40,6 +40,7 @@ var CreateUserPayload = Type("CreateUserPayload", func() {
 	})
 	Attribute("nickname", String, "Nickname", func() {
 		Example("JD")
+		MaxLength(16)
 	})
 	Attribute("password", String, "User password", func() {
 		MinLength(6)
@@ -55,6 +56,10 @@ var CreateUserPayload = Type("CreateUserPayload", func() {
 })
 
 var UserService = Service("user", func() {
+	Security(OAuth2, func() {
+		Scope("openid")
+	})
+
 	Description("User service for managing users")
 
 	HTTP(func() {
@@ -68,7 +73,10 @@ var UserService = Service("user", func() {
 
 	Method("create", func() {
 		Description("Create a new user")
-		Payload(CreateUserPayload)
+		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
+			Extend(CreateUserPayload)
+		})
 		Result(User)
 		HTTP(func() {
 			POST("/")
@@ -79,6 +87,7 @@ var UserService = Service("user", func() {
 	Method("get", func() {
 		Description("Get a user by ID")
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Attribute("id", String, "User ID", func() {
 				Example("f47ac10b-58cc-4372-a567-0e02b2c3d479")
 				Format(FormatUUID)
@@ -96,6 +105,7 @@ var UserService = Service("user", func() {
 	Method("list", func() {
 		Description("List all users with pagination")
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Attribute("limit", Int, "Number of users to return per page", func() {
 				Example(10)
 				Minimum(1)
@@ -120,6 +130,7 @@ var UserService = Service("user", func() {
 	Method("update", func() {
 		Description("Update a user")
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Attribute("id", String, "User ID", func() {
 				Example("f47ac10b-58cc-4372-a567-0e02b2c3d479")
 				Format(FormatUUID)
@@ -150,6 +161,7 @@ var UserService = Service("user", func() {
 	Method("delete", func() {
 		Description("Delete a user")
 		Payload(func() {
+			AccessToken("token", String, "OAuth2 access token used to perform authorization")
 			Attribute("id", String, "User ID", func() {
 				Example("f47ac10b-58cc-4372-a567-0e02b2c3d479")
 				Format(FormatUUID)

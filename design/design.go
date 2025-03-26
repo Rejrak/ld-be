@@ -2,7 +2,7 @@
 package design
 
 import (
-	"be/design/services"
+	"os"
 
 	. "goa.design/goa/v3/dsl"
 )
@@ -20,6 +20,19 @@ var _ = API("be_service", func() {
 		Path("/api/v1")
 	})
 
+	Security(OAuth2, func() {
+		Scope("openid")
+	})
+
+	Meta("swagger:settings", `{
+		"swagger-ui-init-oauth": {
+		  "clientId": "`+os.Getenv("KC_CLIENT_ID")+`",
+		  "clientSecret": "`+os.Getenv("KC_CLIENT_SECRET")+`",
+		  "appName": "be_service",
+		  "usePkceWithAuthorizationCodeGrant": true
+		}
+	  }`)
+
 })
 
-var userService = services.UserService
+var userService = UserService
