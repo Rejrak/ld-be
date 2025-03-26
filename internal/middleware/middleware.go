@@ -44,7 +44,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Ensure the token is signed with the correct method
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Metodo di firma non valido: %v", token.Header["alg"]) // Return error if signing method is invalid
+				return nil, fmt.Errorf("signing method not valid: %v", token.Header["alg"])
 			}
 			return []byte(secretKey), nil // Return the secret key for signature verification
 		})
@@ -68,4 +68,24 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		// Pass the request to the next handler
 		next.ServeHTTP(w, r)
 	})
+}
+
+func ValidateToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("signing method not valid: %v", token.Header["alg"])
+		}
+		return []byte(secretKey), nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("not valid claims")
+	}
+
+	return claims, nil
 }
