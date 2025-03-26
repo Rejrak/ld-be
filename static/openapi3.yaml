@@ -261,7 +261,6 @@ paths:
                         example:
                             admin: false
                             firstName: John
-                            kcId: 550e8400-e29b-41d4-a716-446655440000
                             lastName: Doe
                             nickname: JD
                             password: Secret!1
@@ -431,7 +430,6 @@ paths:
                         example:
                             admin: false
                             firstName: John
-                            kcId: 550e8400-e29b-41d4-a716-446655440000
                             lastName: Doe
                             nickname: JD
             responses:
@@ -576,11 +574,6 @@ components:
                     type: string
                     description: First name
                     example: John
-                kcId:
-                    type: string
-                    description: Keycloak ID
-                    example: 550e8400-e29b-41d4-a716-446655440000
-                    format: uuid
                 lastName:
                     type: string
                     description: Last name
@@ -598,12 +591,10 @@ components:
             example:
                 admin: false
                 firstName: John
-                kcId: 550e8400-e29b-41d4-a716-446655440000
                 lastName: Doe
                 nickname: JD
                 password: Secret!1
             required:
-                - kcId
                 - firstName
                 - lastName
         InternalServerError:
@@ -701,11 +692,6 @@ components:
                     type: string
                     description: First name
                     example: John
-                kcId:
-                    type: string
-                    description: Keycloak ID
-                    example: 550e8400-e29b-41d4-a716-446655440000
-                    format: uuid
                 lastName:
                     type: string
                     description: Last name
@@ -717,11 +703,9 @@ components:
             example:
                 admin: false
                 firstName: John
-                kcId: 550e8400-e29b-41d4-a716-446655440000
                 lastName: Doe
                 nickname: JD
             required:
-                - kcId
                 - firstName
                 - lastName
         User:
