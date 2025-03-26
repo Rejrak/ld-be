@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"goa.design/goa/v3/security"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +27,19 @@ func parseDate(date string) (time.Time, error) {
 
 }
 
-func (s *Service) Create(ctx context.Context, payload *trainingplanService.CreateTrainingPlanPayload) (*trainingplanService.TrainingPlan, error) {
+func (s *Service) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
+	// claims, err := middleware.ValidateToken(token)
+	// if err != nil {
+	// 	return ctx, err
+	// }
+
+	// // Aggiungi i claims nel context, così puoi usarli nei tuoi handler
+	// ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
+
+	return ctx, nil
+}
+
+func (s *Service) Create(ctx context.Context, payload *trainingplanService.CreatePayload) (*trainingplanService.TrainingPlan, error) {
 	startDate, err := parseDate(payload.StartDate)
 	if err != nil {
 		return nil, errors.New("invalid startDate format")
@@ -84,7 +97,7 @@ func (s *Service) Get(ctx context.Context, payload *trainingplanService.GetPaylo
 	}, nil
 }
 
-func (s *Service) List(ctx context.Context) ([]*trainingplanService.TrainingPlan, error) {
+func (s *Service) List(ctx context.Context, payload *trainingplanService.ListPayload) ([]*trainingplanService.TrainingPlan, error) {
 	tps, err := s.Repository.List(ctx, 100, 0)
 	if err != nil {
 		return nil, err
