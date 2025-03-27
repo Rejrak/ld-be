@@ -21,6 +21,33 @@ paths:
             summary: list training_plan
             operationId: training_plan#list
             parameters:
+                - name: userId
+                  in: query
+                  description: Filter by user ID
+                  required: false
+                  type: string
+                  format: uuid
+                - name: startAfter
+                  in: query
+                  description: Filter plans starting after this date (ISO 8601)
+                  required: false
+                  type: string
+                  format: date-time
+                - name: limit
+                  in: query
+                  description: Max number of results
+                  required: false
+                  type: integer
+                  default: 20
+                  maximum: 100
+                  minimum: 1
+                - name: offset
+                  in: query
+                  description: Results to skip
+                  required: false
+                  type: integer
+                  default: 0
+                  minimum: 0
                 - name: Authorization
                   in: header
                   description: OAuth2 access token used to perform authorization
@@ -273,8 +300,9 @@ paths:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/User'
+                        $ref: '#/definitions/UserWithPlans'
                         required:
+                            - trainingPlans
                             - id
                             - kcId
                             - firstName
@@ -490,10 +518,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Errore di comunicazione con il server
-                example: Est earum.
+                example: Minima debitis est impedit qui inventore ipsam.
         description: Errore nel server
         example:
-            message: Excepturi rem autem.
+            message: Qui adipisci est.
         required:
             - message
     NotFound:
@@ -504,10 +532,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Dato non trovato
-                example: Nobis non suscipit.
+                example: Unde excepturi.
         description: Dato non trovato all'interno del sistema
         example:
-            message: Placeat omnis ut iusto.
+            message: Autem quod.
         required:
             - message
     TrainingPlan:
@@ -635,10 +663,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Utente già registrato a
-                example: Aut dignissimos minima.
+                example: Maiores velit.
         description: Autenticazione fallita
         example:
-            message: Est impedit qui inventore ipsam est qui.
+            message: Perferendis aspernatur et aut.
         required:
             - message
     User:
@@ -748,6 +776,99 @@ definitions:
             lastName: Doe
             nickname: JD
         required:
+            - firstName
+            - lastName
+    UserWithPlans:
+        title: UserWithPlans
+        type: object
+        properties:
+            admin:
+                type: boolean
+                description: Is the user an admin?
+                default: false
+                example: false
+            firstName:
+                type: string
+                description: First name of the user
+                example: John
+            id:
+                type: string
+                description: Unique ID of the user
+                example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                format: uuid
+            kcId:
+                type: string
+                description: Keycloak ID
+                example: 550e8400-e29b-41d4-a716-446655440000
+                format: uuid
+            lastName:
+                type: string
+                description: Last name of the user
+                example: Doe
+            nickname:
+                type: string
+                description: Nickname
+                example: JD
+            trainingPlans:
+                type: array
+                items:
+                    $ref: '#/definitions/TrainingPlan'
+                description: List of training plans for the user
+                example:
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
+        example:
+            admin: false
+            firstName: John
+            id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            kcId: 550e8400-e29b-41d4-a716-446655440000
+            lastName: Doe
+            nickname: JD
+            trainingPlans:
+                - description: A 4-week plan focused on upper body hypertrophy.
+                  endDate: "2025-04-25T00:00:00Z"
+                  id: 11111111-2222-3333-4444-555555555555
+                  name: Upper Body Strength
+                  startDate: "2025-03-25T00:00:00Z"
+                  userId: 550e8400-e29b-41d4-a716-446655440000
+                - description: A 4-week plan focused on upper body hypertrophy.
+                  endDate: "2025-04-25T00:00:00Z"
+                  id: 11111111-2222-3333-4444-555555555555
+                  name: Upper Body Strength
+                  startDate: "2025-03-25T00:00:00Z"
+                  userId: 550e8400-e29b-41d4-a716-446655440000
+                - description: A 4-week plan focused on upper body hypertrophy.
+                  endDate: "2025-04-25T00:00:00Z"
+                  id: 11111111-2222-3333-4444-555555555555
+                  name: Upper Body Strength
+                  startDate: "2025-03-25T00:00:00Z"
+                  userId: 550e8400-e29b-41d4-a716-446655440000
+                - description: A 4-week plan focused on upper body hypertrophy.
+                  endDate: "2025-04-25T00:00:00Z"
+                  id: 11111111-2222-3333-4444-555555555555
+                  name: Upper Body Strength
+                  startDate: "2025-03-25T00:00:00Z"
+                  userId: 550e8400-e29b-41d4-a716-446655440000
+        required:
+            - trainingPlans
+            - id
+            - kcId
             - firstName
             - lastName
 securityDefinitions:
