@@ -181,7 +181,7 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrValidationError("user", "get", err)
 			}
-			res := NewGetUserOK(&body)
+			res := NewGetUserWithPlansOK(&body)
 			return res, nil
 		case http.StatusBadRequest:
 			var (
@@ -614,6 +614,21 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			return nil, goahttp.ErrInvalidResponse("user", "delete", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// unmarshalTrainingPlanResponseBodyToUserTrainingPlan builds a value of type
+// *user.TrainingPlan from a value of type *TrainingPlanResponseBody.
+func unmarshalTrainingPlanResponseBodyToUserTrainingPlan(v *TrainingPlanResponseBody) *user.TrainingPlan {
+	res := &user.TrainingPlan{
+		ID:          *v.ID,
+		Name:        *v.Name,
+		Description: v.Description,
+		StartDate:   *v.StartDate,
+		EndDate:     *v.EndDate,
+		UserID:      *v.UserID,
+	}
+
+	return res
 }
 
 // unmarshalUserResponseToUserUser builds a value of type *user.User from a

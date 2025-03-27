@@ -185,8 +185,12 @@ func NewGetPayload(id string, token string) *trainingplan.GetPayload {
 }
 
 // NewListPayload builds a training_plan service list endpoint payload.
-func NewListPayload(token *string) *trainingplan.ListPayload {
+func NewListPayload(userID *string, startAfter *string, limit int, offset int, token *string) *trainingplan.ListPayload {
 	v := &trainingplan.ListPayload{}
+	v.UserID = userID
+	v.StartAfter = startAfter
+	v.Limit = limit
+	v.Offset = offset
 	v.Token = token
 
 	return v

@@ -98,7 +98,7 @@ func (s *Service) Get(ctx context.Context, payload *trainingplanService.GetPaylo
 }
 
 func (s *Service) List(ctx context.Context, payload *trainingplanService.ListPayload) ([]*trainingplanService.TrainingPlan, error) {
-	tps, err := s.Repository.List(ctx, 100, 0)
+	tps, err := s.Repository.List(ctx, payload.Limit, payload.Offset, payload.StartAfter, payload.UserID)
 	if err != nil {
 		return nil, err
 	}

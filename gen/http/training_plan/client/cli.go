@@ -11,6 +11,7 @@ import (
 	trainingplan "be/gen/training_plan"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
@@ -79,7 +80,65 @@ func BuildGetPayload(trainingPlanGetID string, trainingPlanGetToken string) (*tr
 
 // BuildListPayload builds the payload for the training_plan list endpoint from
 // CLI flags.
-func BuildListPayload(trainingPlanListToken string) (*trainingplan.ListPayload, error) {
+func BuildListPayload(trainingPlanListUserID string, trainingPlanListStartAfter string, trainingPlanListLimit string, trainingPlanListOffset string, trainingPlanListToken string) (*trainingplan.ListPayload, error) {
+	var err error
+	var userID *string
+	{
+		if trainingPlanListUserID != "" {
+			userID = &trainingPlanListUserID
+			err = goa.MergeErrors(err, goa.ValidateFormat("userId", *userID, goa.FormatUUID))
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	var startAfter *string
+	{
+		if trainingPlanListStartAfter != "" {
+			startAfter = &trainingPlanListStartAfter
+			err = goa.MergeErrors(err, goa.ValidateFormat("startAfter", *startAfter, goa.FormatDateTime))
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	var limit int
+	{
+		if trainingPlanListLimit != "" {
+			var v int64
+			v, err = strconv.ParseInt(trainingPlanListLimit, 10, strconv.IntSize)
+			limit = int(v)
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for limit, must be INT")
+			}
+			if limit < 1 {
+				err = goa.MergeErrors(err, goa.InvalidRangeError("limit", limit, 1, true))
+			}
+			if limit > 100 {
+				err = goa.MergeErrors(err, goa.InvalidRangeError("limit", limit, 100, false))
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	var offset int
+	{
+		if trainingPlanListOffset != "" {
+			var v int64
+			v, err = strconv.ParseInt(trainingPlanListOffset, 10, strconv.IntSize)
+			offset = int(v)
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for offset, must be INT")
+			}
+			if offset < 0 {
+				err = goa.MergeErrors(err, goa.InvalidRangeError("offset", offset, 0, true))
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	var token *string
 	{
 		if trainingPlanListToken != "" {
@@ -87,6 +146,10 @@ func BuildListPayload(trainingPlanListToken string) (*trainingplan.ListPayload, 
 		}
 	}
 	v := &trainingplan.ListPayload{}
+	v.UserID = userID
+	v.StartAfter = startAfter
+	v.Limit = limit
+	v.Offset = offset
 	v.Token = token
 
 	return v, nil

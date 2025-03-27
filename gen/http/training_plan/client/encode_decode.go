@@ -11,6 +11,7 @@ import (
 	trainingplan "be/gen/training_plan"
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -215,6 +216,16 @@ func EncodeListRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 				req.Header.Set("Authorization", head)
 			}
 		}
+		values := req.URL.Query()
+		if p.UserID != nil {
+			values.Add("userId", *p.UserID)
+		}
+		if p.StartAfter != nil {
+			values.Add("startAfter", *p.StartAfter)
+		}
+		values.Add("limit", fmt.Sprintf("%v", p.Limit))
+		values.Add("offset", fmt.Sprintf("%v", p.Offset))
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

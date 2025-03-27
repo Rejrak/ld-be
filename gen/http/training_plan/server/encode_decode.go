@@ -13,6 +13,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	goahttp "goa.design/goa/v3/http"
@@ -135,13 +136,67 @@ func EncodeListResponse(encoder func(context.Context, http.ResponseWriter) goaht
 func DecodeListRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			token *string
+			userID     *string
+			startAfter *string
+			limit      int
+			offset     int
+			token      *string
+			err        error
 		)
+		qp := r.URL.Query()
+		userIDRaw := qp.Get("userId")
+		if userIDRaw != "" {
+			userID = &userIDRaw
+		}
+		if userID != nil {
+			err = goa.MergeErrors(err, goa.ValidateFormat("userId", *userID, goa.FormatUUID))
+		}
+		startAfterRaw := qp.Get("startAfter")
+		if startAfterRaw != "" {
+			startAfter = &startAfterRaw
+		}
+		if startAfter != nil {
+			err = goa.MergeErrors(err, goa.ValidateFormat("startAfter", *startAfter, goa.FormatDateTime))
+		}
+		{
+			limitRaw := qp.Get("limit")
+			if limitRaw == "" {
+				limit = 20
+			} else {
+				v, err2 := strconv.ParseInt(limitRaw, 10, strconv.IntSize)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("limit", limitRaw, "integer"))
+				}
+				limit = int(v)
+			}
+		}
+		if limit < 1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("limit", limit, 1, true))
+		}
+		if limit > 100 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("limit", limit, 100, false))
+		}
+		{
+			offsetRaw := qp.Get("offset")
+			if offsetRaw != "" {
+				v, err2 := strconv.ParseInt(offsetRaw, 10, strconv.IntSize)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("offset", offsetRaw, "integer"))
+				}
+				offset = int(v)
+			}
+		}
+		if offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("offset", offset, 0, true))
+		}
 		tokenRaw := r.Header.Get("Authorization")
 		if tokenRaw != "" {
 			token = &tokenRaw
 		}
-		payload := NewListPayload(token)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListPayload(userID, startAfter, limit, offset, token)
 		if payload.Token != nil {
 			if strings.Contains(*payload.Token, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

@@ -47,10 +47,27 @@ func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*TrainingPlan,
 	return &tp, nil
 }
 
-func (r *Repository) List(ctx context.Context, limit, offset int) ([]TrainingPlan, error) {
-	query := `SELECT id, name, description, start_date, end_date, user_id FROM training_plan WHERE deleted_at IS NULL ORDER BY start_date LIMIT $1 OFFSET $2`
+func (r *Repository) List(ctx context.Context, limit, offset int, startDate, userID *string) ([]TrainingPlan, error) {
+	query := `
+	SELECT 
+		id, 
+		name, 
+		description, 
+		start_date, 
+		end_date, 
+		user_id 
+	FROM training_plan 
+	WHERE 
+		deleted_at IS NULL 
+			AND 
+		($3::uuid IS NULL OR user_id = $3)
+			AND
+		($4::timestamp IS NULL OR start_date >= $4)
+	ORDER BY start_date 
+	LIMIT $1 OFFSET $2
+	`
 
-	rows, err := r.DB.QueryContext(ctx, query, limit, offset)
+	rows, err := r.DB.QueryContext(ctx, query, limit, offset, userID, startDate)
 	if err != nil {
 		return nil, err
 	}
