@@ -13,7 +13,7 @@ This project is a backend written in **Go** using **Goa DSL**, **OAuth2**, and *
 
 ---
 
-## ⚙️ Project Setup
+## Project Setup
 
 ### 1. Clone the repository
 ```bash
@@ -47,7 +47,7 @@ KC_CLIENT_SECRET="be-client-secret"
 KC_REALM="LastingDynamics"
 ```
 
-> ⚠️ `RS256PK` is your JWT public key in base64 if using RS256
+> `RS256PK` is your JWT public key in base64 if using RS256
 
 ---
 
@@ -91,7 +91,7 @@ http://localhost:9090
 
 KeyCloak will run at:
 ```
-http://localhost:9090
+http://localhost:8080
 ```
 ---
 
