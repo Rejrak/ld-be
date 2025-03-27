@@ -61,7 +61,7 @@ docker compose up -d
 
 ---
 
-## 🚀 Goa Code Generation
+## Goa Code Generation
 
 Every time you modify DSL files in `design/`, regenerate code:
 
@@ -72,7 +72,7 @@ goa gen be/design
 
 ---
 
-## ▶️ Run the Backend
+## ▶ Run the Backend
 
 ```bash
 docker compose up --build
@@ -104,7 +104,7 @@ http://localhost:9090/docs/swagger/
 
 Click **"Authorize"** to log in via OAuth2 using your Identity Provider (e.g. Keycloak).
 
-> ℹ️ This uses **Authorization Code Flow with PKCE**
+>  This uses **Authorization Code Flow with PKCE**
 
 ---
 
@@ -126,7 +126,7 @@ be/
 
 ---
 
-## 🧠 Troubleshooting
+## Troubleshooting
 
 ### Port already in use
 > Check if PostgreSQL or another service is using port `5432` or `9090`
@@ -139,7 +139,7 @@ be/
 
 ---
 
-## 📚 Useful Resources
+## Useful Resources
 - [Goa DSL Docs](https://goa.design/)
 - [golang-migrate](https://github.com/golang-migrate/migrate)
 - [Keycloak Docs](https://www.keycloak.org/docs/)
