@@ -36,14 +36,14 @@ func UsageExamples() string {
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }' --token "Debitis deserunt doloremque temporibus."` + "\n" +
+   }' --token "Hic voluptate et odit rerum."` + "\n" +
 		os.Args[0] + ` user create --body '{
       "admin": false,
       "firstName": "John",
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
-   }' --token "Et voluptatum hic et et sapiente quia."` + "\n" +
+   }' --token "Cumque tenetur molestiae."` + "\n" +
 		""
 }
 
@@ -67,8 +67,12 @@ func ParseEndpoint(
 		trainingPlanGetIDFlag    = trainingPlanGetFlags.String("id", "REQUIRED", "Training plan ID")
 		trainingPlanGetTokenFlag = trainingPlanGetFlags.String("token", "REQUIRED", "")
 
-		trainingPlanListFlags     = flag.NewFlagSet("list", flag.ExitOnError)
-		trainingPlanListTokenFlag = trainingPlanListFlags.String("token", "", "")
+		trainingPlanListFlags          = flag.NewFlagSet("list", flag.ExitOnError)
+		trainingPlanListUserIDFlag     = trainingPlanListFlags.String("user-id", "", "")
+		trainingPlanListStartAfterFlag = trainingPlanListFlags.String("start-after", "", "")
+		trainingPlanListLimitFlag      = trainingPlanListFlags.String("limit", "20", "")
+		trainingPlanListOffsetFlag     = trainingPlanListFlags.String("offset", "", "")
+		trainingPlanListTokenFlag      = trainingPlanListFlags.String("token", "", "")
 
 		trainingPlanUpdateFlags     = flag.NewFlagSet("update", flag.ExitOnError)
 		trainingPlanUpdateBodyFlag  = trainingPlanUpdateFlags.String("body", "REQUIRED", "")
@@ -220,7 +224,7 @@ func ParseEndpoint(
 				data, err = trainingplanc.BuildGetPayload(*trainingPlanGetIDFlag, *trainingPlanGetTokenFlag)
 			case "list":
 				endpoint = c.List()
-				data, err = trainingplanc.BuildListPayload(*trainingPlanListTokenFlag)
+				data, err = trainingplanc.BuildListPayload(*trainingPlanListUserIDFlag, *trainingPlanListStartAfterFlag, *trainingPlanListLimitFlag, *trainingPlanListOffsetFlag, *trainingPlanListTokenFlag)
 			case "update":
 				endpoint = c.Update()
 				data, err = trainingplanc.BuildUpdatePayload(*trainingPlanUpdateBodyFlag, *trainingPlanUpdateIDFlag, *trainingPlanUpdateTokenFlag)
@@ -288,7 +292,7 @@ Example:
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }' --token "Debitis deserunt doloremque temporibus."
+   }' --token "Hic voluptate et odit rerum."
 `, os.Args[0])
 }
 
@@ -300,18 +304,22 @@ Get implements get.
     -token STRING: 
 
 Example:
-    %[1]s training-plan get --id "e366361a-8f76-4aa0-a235-58299e749f0b" --token "Et suscipit et nam aut."
+    %[1]s training-plan get --id "b4e8a506-3b09-47c8-967a-1aa7ec38545c" --token "Quidem eius necessitatibus corporis."
 `, os.Args[0])
 }
 
 func trainingPlanListUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan list -token STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] training-plan list -user-id STRING -start-after STRING -limit INT -offset INT -token STRING
 
 List implements list.
+    -user-id STRING: 
+    -start-after STRING: 
+    -limit INT: 
+    -offset INT: 
     -token STRING: 
 
 Example:
-    %[1]s training-plan list --token "Laborum voluptatem iusto neque."
+    %[1]s training-plan list --user-id "550e8400-e29b-41d4-a716-446655440000" --start-after "2024-01-01T00:00:00Z" --limit 10 --offset 0 --token "Aliquid et suscipit et nam aut omnis."
 `, os.Args[0])
 }
 
@@ -330,7 +338,7 @@ Example:
       "name": "Upper Body Strength",
       "startDate": "2025-03-25T00:00:00Z",
       "userId": "550e8400-e29b-41d4-a716-446655440000"
-   }' --id "998eec70-130e-4cd6-8377-2c474051e173" --token "Repellendus autem in totam ipsum assumenda qui."
+   }' --id "9e3d4d3e-52e4-4a37-8fe3-a4addc24b437" --token "Voluptas assumenda optio."
 `, os.Args[0])
 }
 
@@ -342,7 +350,7 @@ Delete implements delete.
     -token STRING: 
 
 Example:
-    %[1]s training-plan delete --id "66be7108-6e8a-4dcf-8103-408675ac950a" --token "Facilis aut consequatur."
+    %[1]s training-plan delete --id "e04eba39-bfd4-4316-b2cc-0375219209fb" --token "Consequatur qui."
 `, os.Args[0])
 }
 
@@ -377,7 +385,7 @@ Example:
       "lastName": "Doe",
       "nickname": "JD",
       "password": "Secret!1"
-   }' --token "Et voluptatum hic et et sapiente quia."
+   }' --token "Cumque tenetur molestiae."
 `, os.Args[0])
 }
 
@@ -389,7 +397,7 @@ Get a user by ID
     -token STRING: 
 
 Example:
-    %[1]s user get --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Tempora deleniti."
+    %[1]s user get --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Sint iusto doloremque facilis."
 `, os.Args[0])
 }
 
@@ -402,7 +410,7 @@ List all users with pagination
     -token STRING: 
 
 Example:
-    %[1]s user list --limit 10 --offset 0 --token "Quos nisi reiciendis."
+    %[1]s user list --limit 10 --offset 0 --token "Quibusdam nisi ipsa."
 `, os.Args[0])
 }
 
@@ -420,7 +428,7 @@ Example:
       "firstName": "John",
       "lastName": "Doe",
       "nickname": "JD"
-   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Quam molestias consequatur voluptatem laudantium."
+   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Molestias non."
 `, os.Args[0])
 }
 
@@ -432,6 +440,6 @@ Delete a user
     -token STRING: 
 
 Example:
-    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Minus et eveniet commodi ipsa voluptas."
+    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Non est itaque laborum deleniti sint vel."
 `, os.Args[0])
 }

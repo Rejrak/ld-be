@@ -128,10 +128,9 @@ func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security
 	return ctx, nil
 }
 
-// Create crea un nuovo utente sia in Keycloak che nel database
 func (s *Service) Create(ctx context.Context, payload *userService.CreatePayload) (*userService.User, error) {
 	// Creazione in Keycloak
-	userModel := User{
+	userModel := UserWithPlans{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Nickname:  *payload.Nickname,
@@ -163,8 +162,7 @@ func (s *Service) Create(ctx context.Context, payload *userService.CreatePayload
 	}, nil
 }
 
-// Get restituisce un utente dal database
-func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*userService.User, error) {
+func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*userService.UserWithPlans, error) {
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -175,17 +173,29 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 		return nil, err
 	}
 
-	return &userService.User{
-		ID:        user.ID.String(),
-		KcID:      user.KcID.String(),
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Nickname:  &user.Nickname,
-		Admin:     user.Admin,
+	var trainingPlans []*userService.TrainingPlan
+	for _, plan := range user.TrainingPlans {
+		trainingPlans = append(trainingPlans, &userService.TrainingPlan{
+			ID:          plan.ID.String(),
+			Name:        plan.Name,
+			Description: plan.Description,
+			StartDate:   plan.StartDate.Format("2006-01-02T15:04:05Z"),
+			EndDate:     plan.EndDate.Format("2006-01-02T15:04:05Z"),
+			UserID:      plan.UserID.String(),
+		})
+	}
+
+	return &userService.UserWithPlans{
+		ID:            user.ID.String(),
+		KcID:          user.KcID.String(),
+		FirstName:     user.FirstName,
+		LastName:      user.LastName,
+		Nickname:      &user.Nickname,
+		Admin:         user.Admin,
+		TrainingPlans: trainingPlans,
 	}, nil
 }
 
-// List restituisce un elenco di utenti con paginazione
 func (s *Service) List(ctx context.Context, payload *userService.ListPayload) ([]*userService.User, error) {
 	users, err := s.Repository.List(ctx, payload.Limit, payload.Offset)
 	if err != nil {
@@ -207,9 +217,7 @@ func (s *Service) List(ctx context.Context, payload *userService.ListPayload) ([
 	return response, nil
 }
 
-// Update aggiorna un utente nel database e in Keycloak
 func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload) (*userService.User, error) {
-	// Recupera l'utente dal database
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -220,7 +228,6 @@ func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload
 		return nil, err
 	}
 
-	// Aggiorna i dati nel database
 	user.FirstName = payload.FirstName
 	user.LastName = payload.LastName
 	if payload.Nickname != nil {
@@ -234,7 +241,7 @@ func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload
 		return nil, err
 	}
 
-	// Aggiorna in Keycloak
+	// update in keycloak
 	// err = s.KcUpdate(ctx, &payload.FirstName, &payload.LastName, payload.KcID)
 	// if err != nil {
 	// 	utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
@@ -251,9 +258,7 @@ func (s *Service) Update(ctx context.Context, payload *userService.UpdatePayload
 	}, nil
 }
 
-// Delete elimina un utente sia dal database che da Keycloak
 func (s *Service) Delete(ctx context.Context, payload *userService.DeletePayload) error {
-	// Recupera l'utente dal database
 	user, err := s.Repository.FindByID(ctx, payload.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -264,14 +269,13 @@ func (s *Service) Delete(ctx context.Context, payload *userService.DeletePayload
 		return err
 	}
 
-	// Cancella da Keycloak
+	// delete from Keycloak
 	// err = s.KcDelete(ctx, user.KcID.String())
 	// if err != nil {
 	// 	utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 	// 	return err
 	// }
 
-	// Cancella dal database
 	err = s.Repository.DeleteUser(ctx, user.ID.String())
 	if err != nil {
 		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)

@@ -62,6 +62,8 @@ type CreateResponseBody struct {
 // GetResponseBody is the type of the "user" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
+	// List of training plans for the user
+	TrainingPlans []*TrainingPlanResponseBody `form:"trainingPlans" json:"trainingPlans" xml:"trainingPlans"`
 	// Unique ID of the user
 	ID string `form:"id" json:"id" xml:"id"`
 	// Keycloak ID
@@ -211,6 +213,22 @@ type DeleteUnauthorizedResponseBody struct {
 	Message string `form:"message" json:"message" xml:"message"`
 }
 
+// TrainingPlanResponseBody is used to define fields on response body types.
+type TrainingPlanResponseBody struct {
+	// TrainingPlan ID
+	ID string `form:"id" json:"id" xml:"id"`
+	// Name of the training plan
+	Name string `form:"name" json:"name" xml:"name"`
+	// Description of the plan
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Start date in ISO 8601
+	StartDate string `form:"startDate" json:"startDate" xml:"startDate"`
+	// End date in ISO 8601
+	EndDate string `form:"endDate" json:"endDate" xml:"endDate"`
+	// ID of the user who owns the plan
+	UserID string `form:"userId" json:"userId" xml:"userId"`
+}
+
 // UserResponse is used to define fields on response body types.
 type UserResponse struct {
 	// Unique ID of the user
@@ -249,7 +267,7 @@ func NewCreateResponseBody(res *user.User) *CreateResponseBody {
 
 // NewGetResponseBody builds the HTTP response body from the result of the
 // "get" endpoint of the "user" service.
-func NewGetResponseBody(res *user.User) *GetResponseBody {
+func NewGetResponseBody(res *user.UserWithPlans) *GetResponseBody {
 	body := &GetResponseBody{
 		ID:        res.ID,
 		KcID:      res.KcID,
@@ -257,6 +275,14 @@ func NewGetResponseBody(res *user.User) *GetResponseBody {
 		LastName:  res.LastName,
 		Nickname:  res.Nickname,
 		Admin:     res.Admin,
+	}
+	if res.TrainingPlans != nil {
+		body.TrainingPlans = make([]*TrainingPlanResponseBody, len(res.TrainingPlans))
+		for i, val := range res.TrainingPlans {
+			body.TrainingPlans[i] = marshalUserTrainingPlanToTrainingPlanResponseBody(val)
+		}
+	} else {
+		body.TrainingPlans = []*TrainingPlanResponseBody{}
 	}
 	{
 		var zero bool

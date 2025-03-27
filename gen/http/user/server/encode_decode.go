@@ -80,7 +80,7 @@ func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 // endpoint.
 func EncodeGetResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*user.User)
+		res, _ := v.(*user.UserWithPlans)
 		enc := encoder(ctx, w)
 		body := NewGetResponseBody(res)
 		w.WriteHeader(http.StatusOK)
@@ -503,6 +503,21 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// marshalUserTrainingPlanToTrainingPlanResponseBody builds a value of type
+// *TrainingPlanResponseBody from a value of type *user.TrainingPlan.
+func marshalUserTrainingPlanToTrainingPlanResponseBody(v *user.TrainingPlan) *TrainingPlanResponseBody {
+	res := &TrainingPlanResponseBody{
+		ID:          v.ID,
+		Name:        v.Name,
+		Description: v.Description,
+		StartDate:   v.StartDate,
+		EndDate:     v.EndDate,
+		UserID:      v.UserID,
+	}
+
+	return res
 }
 
 // marshalUserUserToUserResponse builds a value of type *UserResponse from a

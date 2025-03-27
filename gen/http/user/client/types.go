@@ -61,6 +61,8 @@ type CreateResponseBody struct {
 // GetResponseBody is the type of the "user" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
+	// List of training plans for the user
+	TrainingPlans []*TrainingPlanResponseBody `form:"trainingPlans,omitempty" json:"trainingPlans,omitempty" xml:"trainingPlans,omitempty"`
 	// Unique ID of the user
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Keycloak ID
@@ -210,6 +212,22 @@ type DeleteUnauthorizedResponseBody struct {
 	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 }
 
+// TrainingPlanResponseBody is used to define fields on response body types.
+type TrainingPlanResponseBody struct {
+	// TrainingPlan ID
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Name of the training plan
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Description of the plan
+	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	// Start date in ISO 8601
+	StartDate *string `form:"startDate,omitempty" json:"startDate,omitempty" xml:"startDate,omitempty"`
+	// End date in ISO 8601
+	EndDate *string `form:"endDate,omitempty" json:"endDate,omitempty" xml:"endDate,omitempty"`
+	// ID of the user who owns the plan
+	UserID *string `form:"userId,omitempty" json:"userId,omitempty" xml:"userId,omitempty"`
+}
+
 // UserResponse is used to define fields on response body types.
 type UserResponse struct {
 	// Unique ID of the user
@@ -283,10 +301,10 @@ func NewCreateUserCreated(body *CreateResponseBody) *user.User {
 	return v
 }
 
-// NewGetUserOK builds a "user" service "get" endpoint result from a HTTP "OK"
-// response.
-func NewGetUserOK(body *GetResponseBody) *user.User {
-	v := &user.User{
+// NewGetUserWithPlansOK builds a "user" service "get" endpoint result from a
+// HTTP "OK" response.
+func NewGetUserWithPlansOK(body *GetResponseBody) *user.UserWithPlans {
+	v := &user.UserWithPlans{
 		ID:        *body.ID,
 		KcID:      *body.KcID,
 		FirstName: *body.FirstName,
@@ -295,6 +313,10 @@ func NewGetUserOK(body *GetResponseBody) *user.User {
 	}
 	if body.Admin != nil {
 		v.Admin = *body.Admin
+	}
+	v.TrainingPlans = make([]*user.TrainingPlan, len(body.TrainingPlans))
+	for i, val := range body.TrainingPlans {
+		v.TrainingPlans[i] = unmarshalTrainingPlanResponseBodyToUserTrainingPlan(val)
 	}
 	if body.Admin == nil {
 		v.Admin = false
@@ -487,6 +509,9 @@ func ValidateCreateResponseBody(body *CreateResponseBody) (err error) {
 
 // ValidateGetResponseBody runs the validations defined on GetResponseBody
 func ValidateGetResponseBody(body *GetResponseBody) (err error) {
+	if body.TrainingPlans == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("trainingPlans", "body"))
+	}
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
@@ -498,6 +523,13 @@ func ValidateGetResponseBody(body *GetResponseBody) (err error) {
 	}
 	if body.LastName == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("lastName", "body"))
+	}
+	for _, e := range body.TrainingPlans {
+		if e != nil {
+			if err2 := ValidateTrainingPlanResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	if body.ID != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
@@ -680,6 +712,39 @@ func ValidateDeleteNotFoundResponseBody(body *DeleteNotFoundResponseBody) (err e
 func ValidateDeleteUnauthorizedResponseBody(body *DeleteUnauthorizedResponseBody) (err error) {
 	if body.Message == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	return
+}
+
+// ValidateTrainingPlanResponseBody runs the validations defined on
+// TrainingPlanResponseBody
+func ValidateTrainingPlanResponseBody(body *TrainingPlanResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.StartDate == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("startDate", "body"))
+	}
+	if body.EndDate == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("endDate", "body"))
+	}
+	if body.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("userId", "body"))
+	}
+	if body.ID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
+	}
+	if body.StartDate != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.startDate", *body.StartDate, goa.FormatDateTime))
+	}
+	if body.EndDate != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.endDate", *body.EndDate, goa.FormatDateTime))
+	}
+	if body.UserID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.userId", *body.UserID, goa.FormatUUID))
 	}
 	return
 }

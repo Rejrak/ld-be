@@ -56,13 +56,13 @@ func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *User, err e
 //   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
 //   - "badRequest" (type *BadRequest): Parametri non validi
 //   - error: internal error
-func (c *Client) Get(ctx context.Context, p *GetPayload) (res *User, err error) {
+func (c *Client) Get(ctx context.Context, p *GetPayload) (res *UserWithPlans, err error) {
 	var ires any
 	ires, err = c.GetEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*User), nil
+	return ires.(*UserWithPlans), nil
 }
 
 // List calls the "list" endpoint of the "user" service.

@@ -103,6 +103,14 @@ type InternalServerError struct {
 type ListPayload struct {
 	// OAuth2 access token used to perform authorization
 	Token *string
+	// Filter by user ID
+	UserID *string
+	// Filter plans starting after this date (ISO 8601)
+	StartAfter *string
+	// Max number of results
+	Limit int
+	// Results to skip
+	Offset int
 }
 
 // Dato non trovato all'interno del sistema
