@@ -49,11 +49,11 @@ func (r *Repository) FindByID(ctx context.Context, userID string) (*UserWithPlan
 	// SELECT
 	// 	u.id,
 	// 	u.kc_id,
-	// 	u.first_name, 
-	// 	u.last_name, 
-	// 	u.nickname, 
-	// 	u.admin, 
-	// 	u.created_at, 
+	// 	u.first_name,
+	// 	u.last_name,
+	// 	u.nickname,
+	// 	u.admin,
+	// 	u.created_at,
 	// 	u.updated_at,
 	// COALESCE(json_agg(
 	// 	json_build_object(
@@ -110,7 +110,6 @@ func (r *Repository) FindByID(ctx context.Context, userID string) (*UserWithPlan
 		if err != nil {
 			return nil, fmt.Errorf("errore nel parsing dei training plan: %w", err)
 		}
-		utils.Log.Debug(ctx, tp)
 		user.TrainingPlans = append(user.TrainingPlans, tp)
 	}
 
@@ -184,7 +183,6 @@ func (r *Repository) DeleteUser(ctx context.Context, userID string) error {
 
 	count, err := res.RowsAffected()
 	if err == nil && count == 0 {
-		utils.Log.Debug(ctx, err)
 		utils.Log.Error(ctx, res, err)
 		return errors.New("user not found or already deleted")
 	}
