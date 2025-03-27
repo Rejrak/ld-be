@@ -6,6 +6,7 @@ import (
 	"os"
 
 	userService "be/gen/user"
+	"be/internal/middleware"
 	"be/internal/utils"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -117,13 +118,14 @@ func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 }
 
 func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error) {
-	// claims, err := middleware.ValidateToken(token)
-	// if err != nil {
-	// 	return ctx, err
-	// }
-
-	// // Aggiungi i claims nel context, così puoi usarli nei tuoi handler
-	// ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
+	claims, err := middleware.ValidateToken(token)
+	if err != nil {
+		return ctx, err
+	}
+	for k, v := range claims {
+		utils.Log.Info(ctx, log.KV{K: k, V: v})
+	}
+	ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
 
 	return ctx, nil
 }

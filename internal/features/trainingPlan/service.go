@@ -2,12 +2,14 @@ package trainingplan
 
 import (
 	trainingplanService "be/gen/training_plan"
+	"be/internal/middleware"
 	"be/internal/utils"
 	"context"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"goa.design/clue/log"
 	"goa.design/goa/v3/security"
 	"gorm.io/gorm"
 )
@@ -28,13 +30,14 @@ func parseDate(date string) (time.Time, error) {
 }
 
 func (s *Service) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
-	// claims, err := middleware.ValidateToken(token)
-	// if err != nil {
-	// 	return ctx, err
-	// }
-
-	// // Aggiungi i claims nel context, così puoi usarli nei tuoi handler
-	// ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
+	claims, err := middleware.ValidateToken(token)
+	if err != nil {
+		return ctx, err
+	}
+	for k, v := range claims {
+		utils.Log.Info(ctx, log.KV{K: k, V: v})
+	}
+	ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
 
 	return ctx, nil
 }
@@ -101,10 +104,6 @@ func (s *Service) List(ctx context.Context, payload *trainingplanService.ListPay
 	tps, err := s.Repository.List(ctx, payload.Limit, payload.Offset, payload.StartAfter, payload.UserID)
 	if err != nil {
 		return nil, err
-	}
-
-	for _, tp := range tps {
-		utils.Log.Debug(ctx, tp)
 	}
 
 	var res []*trainingplanService.TrainingPlan
