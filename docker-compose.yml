@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./docker
+      dockerfile: DockerfileBE
     container_name: backend
     depends_on:
       - postgres
@@ -21,18 +21,23 @@ services:
 
   postgres:
     image: postgres:15
+    build:
+      context: ./docker
+      dockerfile: DockerfileDB
     container_name: postgres
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      POSTGRES_DB: ${DB_NAME}
+      # POSTGRES_DB: ${DB_NAME}
+      POSTGRES_MULTIPLE_DATABASES: ${DB_NAME},${KC_DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
     networks:
       - be_network
   
