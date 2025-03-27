@@ -18,7 +18,7 @@ type Service interface {
 	// Create a new user
 	Create(context.Context, *CreatePayload) (res *User, err error)
 	// Get a user by ID
-	Get(context.Context, *GetPayload) (res *User, err error)
+	Get(context.Context, *GetPayload) (res *UserWithPlans, err error)
 	// List all users with pagination
 	List(context.Context, *ListPayload) (res []*User, err error)
 	// Update a user
@@ -119,6 +119,21 @@ type NotFound struct {
 	Message string
 }
 
+type TrainingPlan struct {
+	// TrainingPlan ID
+	ID string
+	// Name of the training plan
+	Name string
+	// Description of the plan
+	Description *string
+	// Start date in ISO 8601
+	StartDate string
+	// End date in ISO 8601
+	EndDate string
+	// ID of the user who owns the plan
+	UserID string
+}
+
 // Errore di autenticazione non riuscita
 type Unauthorized struct {
 	// Descrizione dell'errore
@@ -143,6 +158,24 @@ type UpdatePayload struct {
 
 // User is the result type of the user service create method.
 type User struct {
+	// Unique ID of the user
+	ID string
+	// Keycloak ID
+	KcID string
+	// First name of the user
+	FirstName string
+	// Last name of the user
+	LastName string
+	// Nickname
+	Nickname *string
+	// Is the user an admin?
+	Admin bool
+}
+
+// UserWithPlans is the result type of the user service get method.
+type UserWithPlans struct {
+	// List of training plans for the user
+	TrainingPlans []*TrainingPlan
 	// Unique ID of the user
 	ID string
 	// Keycloak ID
