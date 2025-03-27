@@ -2,6 +2,9 @@ package middleware
 
 import (
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,7 +14,8 @@ import (
 )
 
 // secretKey is used to verify the JWT signature, loaded from an environment variable.
-var secretKey = os.Getenv("RS256PK")
+var secretKey = os.Getenv("KC_RSA_PUBLIC_KEY")
+var rsaPublicKey *rsa.PublicKey
 
 // contextKey is a type alias for string, used for defining context keys in a type-safe way.
 type contextKey string
@@ -70,21 +74,44 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func init() {
+	keyStr := os.Getenv("KC_RSA_PUBLIC_KEY")
+	if keyStr == "" {
+		panic("KC_RSA_PUBLIC_KEY is not set")
+	}
+
+	block, _ := pem.Decode([]byte(keyStr))
+	if block == nil {
+		panic("failed to decode RSA public key PEM")
+	}
+
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse RSA public key: %v", err))
+	}
+
+	var ok bool
+	rsaPublicKey, ok = pub.(*rsa.PublicKey)
+	if !ok {
+		panic("provided key is not an RSA public key")
+	}
+}
+
 func ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("signing method not valid: %v", token.Header["alg"])
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secretKey), nil
+		return rsaPublicKey, nil
 	})
 
 	if err != nil || !token.Valid {
-		return nil, fmt.Errorf("%w", err)
+		return nil, fmt.Errorf("invalid token: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, fmt.Errorf("not valid claims")
+		return nil, fmt.Errorf("invalid claims format")
 	}
 
 	return claims, nil
