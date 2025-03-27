@@ -100,10 +100,36 @@ var TrainingPlanService = Service("training_plan", func() {
 	Method("list", func() {
 		Payload(func() {
 			AccessToken("token", String, "OAuth2 access token used to perform authorization")
+			Attribute("userId", String, "Filter by user ID", func() {
+				Format(FormatUUID)
+				Example("550e8400-e29b-41d4-a716-446655440000")
+			})
+
+			Attribute("startAfter", String, "Filter plans starting after this date (ISO 8601)", func() {
+				Format(FormatDateTime)
+				Example("2024-01-01T00:00:00Z")
+			})
+
+			Attribute("limit", Int, "Max number of results", func() {
+				Minimum(1)
+				Maximum(100)
+				Default(20)
+				Example(10)
+			})
+
+			Attribute("offset", Int, "Results to skip", func() {
+				Minimum(0)
+				Default(0)
+				Example(0)
+			})
 		})
 		Result(ArrayOf(TrainingPlan))
 		HTTP(func() {
 			GET("")
+			Param("userId")
+			Param("startAfter")
+			Param("limit")
+			Param("offset")
 			Response(StatusOK)
 		})
 	})

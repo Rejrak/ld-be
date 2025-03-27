@@ -31,6 +31,16 @@ var User = Type("User", func() {
 	Required("id", "kcId", "firstName", "lastName")
 })
 
+var UserWithPlans = Type("UserWithPlans", func() {
+	Description("User with associated training plans")
+
+	Extend(User)
+
+	Attribute("trainingPlans", ArrayOf(TrainingPlan), "List of training plans for the user")
+
+	Required("trainingPlans")
+})
+
 var CreateUserPayload = Type("CreateUserPayload", func() {
 	Attribute("firstName", String, "First name", func() {
 		Example("John")
@@ -94,7 +104,7 @@ var UserService = Service("user", func() {
 			})
 			Required("id")
 		})
-		Result(User)
+		Result(UserWithPlans)
 		HTTP(func() {
 			GET("/{id}")
 			Response(StatusOK)
