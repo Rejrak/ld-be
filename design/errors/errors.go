@@ -12,7 +12,7 @@ func CommonResponses() {
 }
 
 var Unauthorized = Type("Unauthorized", func() {
-	Description("Errore di autenticazione non riuscita")
+	Description("User not authorized to access the resource")
 	Attribute("message", String, "Descrizione dell'errore", func() {
 		Default("Utente già registrato a")
 	})
