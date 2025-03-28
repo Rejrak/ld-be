@@ -875,8 +875,7 @@ securityDefinitions:
     oauth2_header_Authorization:
         type: oauth2
         description: OAuth2 flow
-        flow: accessCode
-        authorizationUrl: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth
-        tokenUrl: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token
+        flow: password
+        tokenUrl: http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token
         scopes:
             openid: Access basic profile
