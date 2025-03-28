@@ -10,5 +10,5 @@ var OAuth2 = OAuth2Security("oauth2", func() {
 		"http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 	)
 
-	Scope("openid", "Access basic profile")
+	Scope("openid", "Access basic profile lasting_scope")
 })
