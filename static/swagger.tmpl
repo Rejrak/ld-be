@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <link rel="shortcut icon" href="https://www.lastingdynamics.com/wp-content/uploads/2021/09/cropped-logo_favicon_512x512-150x150.png">
+    <title>Lasting Dynamics Service</title>
+</head>
+<body>
+<div id="swagger-ui">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<!-- `SwaggerUIBundle` is now available on the page -->
+<script>
+  const ui = SwaggerUIBundle({
+    url: '/openapi3.yaml',
+    "dom_id": "#swagger-ui",
+    "layout": "BaseLayout",
+    "deepLinking": true,
+    "showExtensions": true,
+    "showCommonExtensions": true,
+    "defaultModelsExpandDepth": -1,
+    "docExpansion": "none",
+    "displayRequestDuration": true,
+    "filter": true,
+    oauth2RedirectUrl: "{{.RedirectURL}}",
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIBundle.SwaggerUIStandalonePreset
+    ],
+  });
+
+  ui.initOAuth({
+    clientId: "{{.ClientID}}",
+    clientSecret: "{{.ClientSecret}}",
+    appName: "{{.AppName}}",
+    realm: "{{.Realm}}",
+    usePkceWithAuthorizationCodeGrant: true,
+    scopes: "openid email profile"
+  });
+
+  window.ui = ui;
+</script>
+</body>
+</html>
+    
