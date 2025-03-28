@@ -36,11 +36,9 @@ func main() {
 
 	go handleSignals(errc) // Start goroutine to listen for OS signals (e.g., SIGINT, SIGTERM)
 
-	go func() {
-		if err := moveFile("./gen/http/openapi3.yaml", "./static/openapi3.yaml"); err != nil {
-			log.Debugf(ctx, "error: %v", err)
-		}
-	}()
+	if err := moveFile("./gen/http/openapi3.yaml", "./static/openapi3.yaml"); err != nil {
+		log.Debugf(ctx, "error: %v", err)
+	}
 
 	// Create a cancellable context to manage server shutdown.
 	ctx, cancel := context.WithCancel(ctx)
@@ -82,7 +80,7 @@ func handleSignals(errc chan error) {
 func moveFile(src, dst string) error {
 	input, err := os.ReadFile(src)
 	if err != nil {
-		return fmt.Errorf("failed to read source file: %w", err)
+		return fmt.Errorf("failed to read source file: %w or already moved", err)
 	}
 
 	err = os.WriteFile(dst, input, 0644)
