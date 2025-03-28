@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 
 	userService "be/gen/user"
@@ -117,6 +118,46 @@ func (s *Service) KcDelete(ctx context.Context, uuid string) error {
 	return nil
 }
 
+func (s *Service) KcGetUser(ctx context.Context, uuid string) (*gocloak.User, error) {
+	token, err := s.GetToken(ctx)
+	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+		return nil, errors.New("communication error [KC-TK]")
+	}
+
+	user, err := s.client.GetUserByID(ctx, token.AccessToken, s.realm, uuid)
+	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+		return nil, errors.New("communication error [KC-GU]")
+	}
+
+	return user, nil
+}
+
+func (s *Service) KcGetUserGroups(ctx context.Context, uuid string) ([]*gocloak.Group, error) {
+	token, err := s.GetToken(ctx)
+	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+		return nil, errors.New("communication error [KC-TK]")
+	}
+
+	groups, err := s.client.GetUserGroups(ctx, token.AccessToken, s.realm, uuid, gocloak.GetGroupsParams{})
+	if err != nil {
+		return nil, fmt.Errorf("cannot fetch user groups: %w", err)
+	}
+
+	for _, group := range groups {
+		fullGroup, err := s.client.GetGroup(ctx, token.AccessToken, s.realm, *group.ID)
+		if err != nil {
+			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+			continue
+		}
+		utils.Log.Info(ctx, log.KV{K: "group", V: *fullGroup.Name})
+		utils.Log.Info(ctx, log.KV{K: "attributes", V: *fullGroup.Attributes})
+	}
+	return groups, nil
+}
+
 func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error) {
 	claims, err := middleware.ValidateToken(token)
 	if err != nil {
@@ -125,6 +166,24 @@ func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security
 	for k, v := range claims {
 		utils.Log.Info(ctx, log.KV{K: k, V: v})
 	}
+	if claims["sub"] == nil {
+		return ctx, errors.New("invalid token")
+	}
+
+	groups, err := s.KcGetUserGroups(ctx, claims["sub"].(string))
+
+	is_pro := false
+	for _, group := range groups {
+		if *group.Name == "pro" {
+			is_pro = true
+			break
+		}
+	}
+	if !is_pro {
+		return ctx, &userService.Unauthorized{
+			Message: "User not authorized"}
+	}
+
 	ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
 
 	return ctx, nil
@@ -169,10 +228,10 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-			return nil, &userService.NotFound{Message: "Utente non trovato"}
+			return nil, &userService.NotFound{Message: "User not found"}
 		}
 		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return nil, err
+		return nil, &userService.InternalServerError{Message: "Internal Server error"}
 	}
 
 	var trainingPlans []*userService.TrainingPlan
