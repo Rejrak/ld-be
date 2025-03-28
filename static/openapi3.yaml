@@ -759,7 +759,7 @@ components:
                     description: Descrizione dell'errore
                     default: Utente già registrato a
                     example: Non suscipit nobis placeat omnis ut iusto.
-            description: Errore di autenticazione non riuscita
+            description: User not authorized to access the resource
             example:
                 message: Expedita corrupti nisi et repellat.
             required:
