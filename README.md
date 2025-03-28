@@ -6,10 +6,11 @@ This project is a backend written in **Go** using **Goa DSL**, **OAuth2**, and *
 
 ## Requirements
 
-- Go == 1.23 
-- PostgreSQL == 13
-- [golang-migrate](https://github.com/golang-migrate/migrate) CLI installed
+- Go == 1.23.7 
+- PostgreSQL == 15
+- [golang-migrate](https://github.com/golang-migrate/migrate) CLI installed (optional)
 - [Docker](https://www.docker.com/)
+- [goa](goa.design/goa/v3/cmd/goa@v3.20.0) install by: go install 
 
 ---
 
