@@ -1,4 +1,4 @@
-FROM golang:1.23.2-alpine AS builder
+FROM golang:1.23.7-alpine AS builder
 
 WORKDIR /app
 
@@ -8,16 +8,16 @@ RUN go mod tidy
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ausa ./cmd/ausa/.
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ld ./cmd/ld/.
 
 FROM debian:bookworm-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/ausa .
+COPY --from=builder /app/ld .
 COPY --from=builder /app/static ./static
 COPY --from=builder /app/gen/http/openapi3.yaml ./static/openapi3.yaml
 
 EXPOSE 9090
 
-CMD ["./ausa", "--debug=true"]
+CMD ["./ld", "--debug=true"]
