@@ -95,6 +95,105 @@ http://localhost:8080
 ```
 ---
 
+## Keycloak Configuration
+
+To make Keycloak work with this backend and Swagger UI, follow these steps:
+
+### 1. Access the Keycloak Admin Panel
+
+Open your browser and go to [http://localhost:8080](http://localhost:8080).  
+Log in using the credentials defined in your `.env` file:
+
+```env
+KC_ADMIN_USER=admin
+KC_ADMIN_PASS=adminpassword
+```
+
+---
+
+### 2. Create a Realm (if it doesn't exist)
+
+- Go to **Realm Settings**
+- Click **Create Realm**
+- Name it:
+
+```
+LastingDynamics
+```
+
+> This must match `KC_REALM` in your `.env`.
+
+---
+
+### 3. Create a Client for the Backend
+
+- Go to **Clients > Create**
+- Fill the following:
+  - **Client ID**: `be-client`
+  - **Client Protocol**: `openid-connect`
+- Click **Next**
+
+#### Update Client Settings:
+
+- **Root URL**:  
+  ```
+  http://localhost:9090
+  ```
+
+- Set:
+  - **Access Type**: `confidential`
+  - Enable:
+    - ✅ Standard Flow
+    - ✅ Direct Access Grants
+
+- **Valid Redirect URIs**:
+  ```
+  http://localhost:9090/docs/oauth2-redirect
+  ```
+
+- Save the client.
+
+---
+
+### 4. Retrieve the Client Secret
+
+- After saving, go to the **Credentials** tab.
+- Copy the `Secret` value.
+- Paste it into your `.env` file:
+
+```env
+KC_CLIENT_SECRET=your-client-secret-here
+```
+
+---
+
+### 5. Create a Test User
+
+- Go to **Users > Add User**
+- Fill in a username, email, etc. → Save
+- Go to the **Credentials** tab
+  - Set a password
+  - Disable "Temporary"
+- Save the password.
+
+---
+
+### 6. Copy the Realm Public Key
+
+- Go to **Realm Settings > Keys > RS256**
+- Click **Public Key**
+- Copy it and save it in `.env` as a single-line PEM:
+
+```env
+KC_RSA_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC KEY-----"
+```
+
+> Replace line breaks with `\n` or load the key from a `.pem` file at runtime.
+
+---
+
+
+
 ## 🔍 Swagger UI (interactive docs)
 
 Swagger UI is available at:
@@ -146,5 +245,5 @@ be/
 
 ---
 
-**Rejrak**
+**Rejrak** - Roberto Lucchetti
 
