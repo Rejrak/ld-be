@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"sync"
+	"text/template"
 	"time"
 
 	"goa.design/clue/log"
@@ -150,6 +151,19 @@ func withMuxer(ctx context.Context, dbg bool, epsMap map[config.EndpointName]int
 	return
 }
 
+func ServeSwaggerIndex(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./static/swagger.tmpl"))
+
+	tmpl.Execute(w, map[string]string{
+		"ClientID":     os.Getenv("KC_CLIENT_ID"),
+		"ClientSecret": os.Getenv("KC_CLIENT_SECRET"),
+		"AppName":      "be_service",
+		"Realm":        os.Getenv("KC_REALM"),
+		"RedirectURL":  "http://localhost:9090/docs/oauth2-redirect",
+		"KeycloakHost": os.Getenv("KC_HOST"), // es: http://localhost:8080
+	})
+}
+
 // withDocsHandler sets up HTTP handlers for serving Swagger UI, OpenAPI spec, and API documentation.
 // It registers routes for serving static files and dynamically generated documentation pages.
 func withDocsHandler(mux goahttp.Muxer) goahttp.Muxer {
@@ -162,18 +176,20 @@ func withDocsHandler(mux goahttp.Muxer) goahttp.Muxer {
 		http.ServeFile(w, r, "./static/openapi3.yaml")
 	})
 
-	mux.Handle("GET", "/docs/swagger", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html")
-		w.WriteHeader(http.StatusOK)
-		swagger, err := withSwagger()
-		if err != nil {
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		_, _ = w.Write(swagger)
-	})
+	// mux.Handle("GET", "/docs/swagger", func(w http.ResponseWriter, r *http.Request) {
+	// 	w.Header().Set("Content-Type", "text/html")
+	// 	w.WriteHeader(http.StatusOK)
+	// 	swagger, err := withSwagger()
+	// 	if err != nil {
+	// 		_, _ = w.Write([]byte(err.Error()))
+	// 		return
+	// 	}
+	// 	_, _ = w.Write(swagger)
+	// })
 
-	mux.Handle("GET", "/docs/redoc", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("GET", "/docs", ServeSwaggerIndex)
+
+	mux.Handle("GET", "/redoc", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusOK)
 		redoc, err := withRedoc()
