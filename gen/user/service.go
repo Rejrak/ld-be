@@ -134,7 +134,7 @@ type TrainingPlan struct {
 	UserID string
 }
 
-// Errore di autenticazione non riuscita
+// User not authorized to access the resource
 type Unauthorized struct {
 	// Descrizione dell'errore
 	Message string
@@ -243,7 +243,7 @@ func (e *NotFound) GoaErrorName() string {
 
 // Error returns an error description.
 func (e *Unauthorized) Error() string {
-	return "Errore di autenticazione non riuscita"
+	return "User not authorized to access the resource"
 }
 
 // ErrorName returns "Unauthorized".
