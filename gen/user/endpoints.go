@@ -57,9 +57,9 @@ func NewCreateEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endp
 			RequiredScopes: []string{"openid"},
 			Flows: []*security.OAuthFlow{
 				&security.OAuthFlow{
-					Type:             "authorization_code",
-					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
-					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+					Type:       "password",
+					TokenURL:   "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
+					RefreshURL: "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 				},
 			},
 		}
@@ -87,9 +87,9 @@ func NewGetEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoin
 			RequiredScopes: []string{"openid"},
 			Flows: []*security.OAuthFlow{
 				&security.OAuthFlow{
-					Type:             "authorization_code",
-					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
-					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+					Type:       "password",
+					TokenURL:   "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
+					RefreshURL: "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 				},
 			},
 		}
@@ -117,9 +117,9 @@ func NewListEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoi
 			RequiredScopes: []string{"openid"},
 			Flows: []*security.OAuthFlow{
 				&security.OAuthFlow{
-					Type:             "authorization_code",
-					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
-					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+					Type:       "password",
+					TokenURL:   "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
+					RefreshURL: "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 				},
 			},
 		}
@@ -147,9 +147,9 @@ func NewUpdateEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endp
 			RequiredScopes: []string{"openid"},
 			Flows: []*security.OAuthFlow{
 				&security.OAuthFlow{
-					Type:             "authorization_code",
-					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
-					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+					Type:       "password",
+					TokenURL:   "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
+					RefreshURL: "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 				},
 			},
 		}
@@ -177,9 +177,9 @@ func NewDeleteEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endp
 			RequiredScopes: []string{"openid"},
 			Flows: []*security.OAuthFlow{
 				&security.OAuthFlow{
-					Type:             "authorization_code",
-					AuthorizationURL: "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth",
-					TokenURL:         "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token",
+					Type:       "password",
+					TokenURL:   "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
+					RefreshURL: "http://localhost:8080/realms/LastingDynamics/protocol/openid-connect/token",
 				},
 			},
 		}
