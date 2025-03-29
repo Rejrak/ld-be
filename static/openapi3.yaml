@@ -80,13 +80,19 @@ paths:
                                       name: Upper Body Strength
                                       startDate: "2025-03-25T00:00:00Z"
                                       userId: 550e8400-e29b-41d4-a716-446655440000
+                                    - description: A 4-week plan focused on upper body hypertrophy.
+                                      endDate: "2025-04-25T00:00:00Z"
+                                      id: 11111111-2222-3333-4444-555555555555
+                                      name: Upper Body Strength
+                                      startDate: "2025-03-25T00:00:00Z"
+                                      userId: 550e8400-e29b-41d4-a716-446655440000
+                                    - description: A 4-week plan focused on upper body hypertrophy.
+                                      endDate: "2025-04-25T00:00:00Z"
+                                      id: 11111111-2222-3333-4444-555555555555
+                                      name: Upper Body Strength
+                                      startDate: "2025-03-25T00:00:00Z"
+                                      userId: 550e8400-e29b-41d4-a716-446655440000
                             example:
-                                - description: A 4-week plan focused on upper body hypertrophy.
-                                  endDate: "2025-04-25T00:00:00Z"
-                                  id: 11111111-2222-3333-4444-555555555555
-                                  name: Upper Body Strength
-                                  startDate: "2025-03-25T00:00:00Z"
-                                  userId: 550e8400-e29b-41d4-a716-446655440000
                                 - description: A 4-week plan focused on upper body hypertrophy.
                                   endDate: "2025-04-25T00:00:00Z"
                                   id: 11111111-2222-3333-4444-555555555555
@@ -148,9 +154,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: 2265bdf0-5f68-4b37-be8b-9cb87ffe43e2
+                    example: da2eb2da-d1c7-4749-9cc4-28c4476034e5
                     format: uuid
-                  example: 92e0e03c-8fcb-433c-bc96-ec2d2709fcfd
+                  example: 57080e3f-6510-41d6-85f0-05a69c95c104
             responses:
                 "204":
                     description: No Content response.
@@ -170,9 +176,9 @@ paths:
                   schema:
                     type: string
                     description: Training plan ID
-                    example: 5b8eeb8c-f5bc-4eb2-bbf5-d888f83494e5
+                    example: 5b8eeb12-ca05-447d-b7d2-4315640e5921
                     format: uuid
-                  example: b571eeef-1a49-48a0-9407-a72ffaa93672
+                  example: 0a10a786-9587-488a-b104-5ac70cae39a4
             responses:
                 "200":
                     description: OK response.
@@ -201,9 +207,9 @@ paths:
                   required: true
                   schema:
                     type: string
-                    example: 93006a21-768b-4689-b085-d95b6676ec58
+                    example: bfbb3720-8092-4add-97f4-daf6f4c55a18
                     format: uuid
-                  example: 6adb67ef-6326-413d-b60d-aca9346d299e
+                  example: 4ac48427-6181-4589-8326-da9b03c67b8e
             requestBody:
                 required: true
                 content:
@@ -288,7 +294,25 @@ paths:
                                       kcId: 550e8400-e29b-41d4-a716-446655440000
                                       lastName: Doe
                                       nickname: JD
+                                    - admin: false
+                                      firstName: John
+                                      id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                      kcId: 550e8400-e29b-41d4-a716-446655440000
+                                      lastName: Doe
+                                      nickname: JD
                             example:
+                                - admin: false
+                                  firstName: John
+                                  id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                  kcId: 550e8400-e29b-41d4-a716-446655440000
+                                  lastName: Doe
+                                  nickname: JD
+                                - admin: false
+                                  firstName: John
+                                  id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                                  kcId: 550e8400-e29b-41d4-a716-446655440000
+                                  lastName: Doe
+                                  nickname: JD
                                 - admin: false
                                   firstName: John
                                   id: f47ac10b-58cc-4372-a567-0e02b2c3d479
@@ -361,7 +385,7 @@ paths:
                 "204":
                     description: No Content response.
                 "400":
-                    description: 'badRequest: Parametri non validi'
+                    description: 'badRequest: Invalid Request'
                     content:
                         application/json:
                             schema:
@@ -374,7 +398,7 @@ paths:
                                 temporary: false
                                 timeout: false
                 "401":
-                    description: 'unauthorized: Autenticazione fallita'
+                    description: 'unauthorized: Auth Failed'
                     content:
                         application/json:
                             schema:
@@ -382,7 +406,7 @@ paths:
                             example:
                                 message: Et eveniet commodi ipsa.
                 "404":
-                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    description: 'notFound: Not Found'
                     content:
                         application/json:
                             schema:
@@ -390,7 +414,7 @@ paths:
                             example:
                                 message: In qui consectetur voluptas aperiam.
                 "500":
-                    description: 'internalServerError: Errore nel server'
+                    description: 'internalServerError: Internal Server Error'
                     content:
                         application/json:
                             schema:
@@ -445,7 +469,7 @@ paths:
                                       startDate: "2025-03-25T00:00:00Z"
                                       userId: 550e8400-e29b-41d4-a716-446655440000
                 "400":
-                    description: 'badRequest: Parametri non validi'
+                    description: 'badRequest: Invalid Request'
                     content:
                         application/json:
                             schema:
@@ -458,7 +482,7 @@ paths:
                                 temporary: false
                                 timeout: false
                 "401":
-                    description: 'unauthorized: Autenticazione fallita'
+                    description: 'unauthorized: Auth Failed'
                     content:
                         application/json:
                             schema:
@@ -466,7 +490,7 @@ paths:
                             example:
                                 message: Quia commodi tempora deleniti architecto qui sunt.
                 "404":
-                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    description: 'notFound: Not Found'
                     content:
                         application/json:
                             schema:
@@ -474,7 +498,7 @@ paths:
                             example:
                                 message: Et nostrum.
                 "500":
-                    description: 'internalServerError: Errore nel server'
+                    description: 'internalServerError: Internal Server Error'
                     content:
                         application/json:
                             schema:
@@ -527,7 +551,7 @@ paths:
                                 lastName: Doe
                                 nickname: JD
                 "400":
-                    description: 'badRequest: Parametri non validi'
+                    description: 'badRequest: Invalid Request'
                     content:
                         application/json:
                             schema:
@@ -540,7 +564,7 @@ paths:
                                 temporary: false
                                 timeout: false
                 "401":
-                    description: 'unauthorized: Autenticazione fallita'
+                    description: 'unauthorized: Auth Failed'
                     content:
                         application/json:
                             schema:
@@ -548,7 +572,7 @@ paths:
                             example:
                                 message: Cum quam molestias.
                 "404":
-                    description: 'notFound: Dato non trovato all''interno del sistema'
+                    description: 'notFound: Not Found'
                     content:
                         application/json:
                             schema:
@@ -556,7 +580,7 @@ paths:
                             example:
                                 message: Voluptatum qui fugiat ut error.
                 "500":
-                    description: 'internalServerError: Errore nel server'
+                    description: 'internalServerError: Internal Server Error'
                     content:
                         application/json:
                             schema:
@@ -681,6 +705,19 @@ components:
             required:
                 - firstName
                 - lastName
+        Forbidden:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Detailed description of the error
+                    default: Access to the resource is forbidden
+                    example: Voluptas tempora.
+            description: Cannot access the resource
+            example:
+                message: Laborum qui quidem minima autem dolor.
+            required:
+                - message
         InternalServerError:
             type: object
             properties:
@@ -891,6 +928,18 @@ components:
                 lastName: Doe
                 nickname: JD
                 trainingPlans:
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
                     - description: A 4-week plan focused on upper body hypertrophy.
                       endDate: "2025-04-25T00:00:00Z"
                       id: 11111111-2222-3333-4444-555555555555

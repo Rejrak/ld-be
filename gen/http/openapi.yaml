@@ -495,7 +495,7 @@ definitions:
                 type: boolean
                 description: Indica se l'errore è dovuto a un timeout
                 example: false
-        description: Parametri non validi
+        description: Invalid Request
         example:
             fault: false
             id: Aonp24i2
@@ -519,7 +519,7 @@ definitions:
                 description: Descrizione dell'errore
                 default: Errore di comunicazione con il server
                 example: Minima debitis est impedit qui inventore ipsam.
-        description: Errore nel server
+        description: Internal Server Error
         example:
             message: Qui adipisci est.
         required:
@@ -533,7 +533,7 @@ definitions:
                 description: Descrizione dell'errore
                 default: Dato non trovato
                 example: Unde excepturi.
-        description: Dato non trovato all'interno del sistema
+        description: Not Found
         example:
             message: Autem quod.
         required:
@@ -664,7 +664,7 @@ definitions:
                 description: Descrizione dell'errore
                 default: Utente già registrato a
                 example: Maiores velit.
-        description: Autenticazione fallita
+        description: Auth Failed
         example:
             message: Perferendis aspernatur et aut.
         required:
