@@ -1,4 +1,4 @@
-# Lasting Dynamics Backend (Goa + PostgreSQL + OAuth2)
+# Lasting Dynamics Backend (Goa + PostgreSQL + OAuth2 - KeyCloak)
 
 This project is a backend written in **Go** using **Goa DSL**, **OAuth2**, and **PostgreSQL** with support for **migrations** via `golang-migrate`.
 
@@ -199,7 +199,12 @@ KC_RSA_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkq...\n-----END PUBLIC 
 
 Swagger UI is available at:
 ```
-http://localhost:9090/docs/swagger/
+http://localhost:9090/docs
+```
+
+Redoc UI is available at:
+```
+http://localhost:9090/redoc
 ```
 
 Click **"Authorize"** to log in via OAuth2 using your Identity Provider (e.g. Keycloak).
