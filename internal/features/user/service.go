@@ -3,10 +3,10 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 
 	userService "be/gen/user"
+	common "be/internal/features/common"
 	"be/internal/middleware"
 	"be/internal/utils"
 
@@ -23,6 +23,7 @@ type Service struct {
 	clientID     string
 	clientSecret string
 	realm        string
+	access       *common.UserAccess
 }
 
 func NewService() *Service {
@@ -38,6 +39,7 @@ func NewService() *Service {
 		clientSecret: kcSecret,
 		realm:        kcRealm,
 		Repository:   NewRepository(),
+		access:       common.NewUserAccess(),
 	}
 }
 
@@ -137,13 +139,14 @@ func (s *Service) KcGetUser(ctx context.Context, uuid string) (*gocloak.User, er
 func (s *Service) KcGetUserGroups(ctx context.Context, uuid string) ([]*gocloak.Group, error) {
 	token, err := s.GetToken(ctx)
 	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return nil, errors.New("communication error [KC-TK]")
+		utils.Log.Error(ctx, log.KV{K: "KC-TK", V: err}, err)
+		return nil, &userService.InternalServerError{Message: "Internal Server error"}
 	}
 
 	groups, err := s.client.GetUserGroups(ctx, token.AccessToken, s.realm, uuid, gocloak.GetGroupsParams{})
 	if err != nil {
-		return nil, fmt.Errorf("cannot fetch user groups: %w", err)
+		utils.Log.Error(ctx, log.KV{K: "KC-FG", V: err}, err)
+		return nil, &userService.InternalServerError{Message: "Internal Server error"}
 	}
 
 	for _, group := range groups {
@@ -158,31 +161,52 @@ func (s *Service) KcGetUserGroups(ctx context.Context, uuid string) ([]*gocloak.
 	return groups, nil
 }
 
+func (s *Service) parseUserAccess(groups []*gocloak.Group) {
+	for _, group := range groups {
+		paid := false
+		if group.Attributes != nil {
+			if val, ok := (*group.Attributes)["paid"]; ok {
+				if val[0] == "1" {
+					paid = true
+				}
+			}
+		}
+
+		switch *group.Name {
+		case "pro":
+			s.access.Detail = true
+			s.access.List = true
+			if paid {
+				s.access.Edit = true
+			}
+		case "base":
+			s.access.Detail = true
+			s.access.List = false
+			if paid {
+				s.access.Edit = true
+			}
+		}
+	}
+}
+
 func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error) {
 	claims, err := middleware.ValidateToken(token)
 	if err != nil {
 		return ctx, err
 	}
 	for k, v := range claims {
-		utils.Log.Info(ctx, log.KV{K: k, V: v})
+		utils.Log.Debug(ctx, log.KV{K: k, V: v})
 	}
 	if claims["sub"] == nil {
 		return ctx, errors.New("invalid token")
 	}
 
 	groups, err := s.KcGetUserGroups(ctx, claims["sub"].(string))
-
-	is_pro := false
-	for _, group := range groups {
-		if *group.Name == "pro" {
-			is_pro = true
-			break
-		}
+	if err != nil {
+		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
+		return ctx, &userService.InternalServerError{Message: "Internal Server error"}
 	}
-	if !is_pro {
-		return ctx, &userService.Unauthorized{
-			Message: "User not authorized"}
-	}
+	s.parseUserAccess(groups)
 
 	ctx = context.WithValue(ctx, middleware.ClaimsKey, claims)
 
@@ -258,6 +282,10 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 }
 
 func (s *Service) List(ctx context.Context, payload *userService.ListPayload) ([]*userService.User, error) {
+	if !s.access.List {
+		return nil, &userService.Forbidden{Message: "Forbidden"}
+	}
+
 	users, err := s.Repository.List(ctx, payload.Limit, payload.Offset)
 	if err != nil {
 		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
