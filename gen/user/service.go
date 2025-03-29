@@ -89,6 +89,12 @@ type DeletePayload struct {
 	ID string
 }
 
+// Cannot access the resource
+type Forbidden struct {
+	// Detailed description of the error
+	Message string
+}
+
 // GetPayload is the payload type of the user service get method.
 type GetPayload struct {
 	// OAuth2 access token used to perform authorization
@@ -205,6 +211,23 @@ func (e *BadRequest) ErrorName() string {
 // GoaErrorName returns "BadRequest".
 func (e *BadRequest) GoaErrorName() string {
 	return "badRequest"
+}
+
+// Error returns an error description.
+func (e *Forbidden) Error() string {
+	return "Cannot access the resource"
+}
+
+// ErrorName returns "Forbidden".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e *Forbidden) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "Forbidden".
+func (e *Forbidden) GoaErrorName() string {
+	return "forbidden"
 }
 
 // Error returns an error description.

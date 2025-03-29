@@ -35,10 +35,11 @@ func NewClient(create, get, list, update, delete_ goa.Endpoint) *Client {
 
 // Create calls the "create" endpoint of the "user" service.
 // Create may return the following errors:
-//   - "unauthorized" (type *Unauthorized): Autenticazione fallita
-//   - "internalServerError" (type *InternalServerError): Errore nel server
-//   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
-//   - "badRequest" (type *BadRequest): Parametri non validi
+//   - "unauthorized" (type *Unauthorized): Auth Failed
+//   - "internalServerError" (type *InternalServerError): Internal Server Error
+//   - "notFound" (type *NotFound): Not Found
+//   - "badRequest" (type *BadRequest): Invalid Request
+//   - "forbidden" (type *Forbidden): Accesso negato
 //   - error: internal error
 func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *User, err error) {
 	var ires any
@@ -51,10 +52,11 @@ func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *User, err e
 
 // Get calls the "get" endpoint of the "user" service.
 // Get may return the following errors:
-//   - "unauthorized" (type *Unauthorized): Autenticazione fallita
-//   - "internalServerError" (type *InternalServerError): Errore nel server
-//   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
-//   - "badRequest" (type *BadRequest): Parametri non validi
+//   - "unauthorized" (type *Unauthorized): Auth Failed
+//   - "internalServerError" (type *InternalServerError): Internal Server Error
+//   - "notFound" (type *NotFound): Not Found
+//   - "badRequest" (type *BadRequest): Invalid Request
+//   - "forbidden" (type *Forbidden): Accesso negato
 //   - error: internal error
 func (c *Client) Get(ctx context.Context, p *GetPayload) (res *UserWithPlans, err error) {
 	var ires any
@@ -67,10 +69,11 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *UserWithPlans, er
 
 // List calls the "list" endpoint of the "user" service.
 // List may return the following errors:
-//   - "unauthorized" (type *Unauthorized): Autenticazione fallita
-//   - "internalServerError" (type *InternalServerError): Errore nel server
-//   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
-//   - "badRequest" (type *BadRequest): Parametri non validi
+//   - "unauthorized" (type *Unauthorized): Auth Failed
+//   - "internalServerError" (type *InternalServerError): Internal Server Error
+//   - "notFound" (type *NotFound): Not Found
+//   - "badRequest" (type *BadRequest): Invalid Request
+//   - "forbidden" (type *Forbidden): Accesso negato
 //   - error: internal error
 func (c *Client) List(ctx context.Context, p *ListPayload) (res []*User, err error) {
 	var ires any
@@ -83,10 +86,11 @@ func (c *Client) List(ctx context.Context, p *ListPayload) (res []*User, err err
 
 // Update calls the "update" endpoint of the "user" service.
 // Update may return the following errors:
-//   - "unauthorized" (type *Unauthorized): Autenticazione fallita
-//   - "internalServerError" (type *InternalServerError): Errore nel server
-//   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
-//   - "badRequest" (type *BadRequest): Parametri non validi
+//   - "unauthorized" (type *Unauthorized): Auth Failed
+//   - "internalServerError" (type *InternalServerError): Internal Server Error
+//   - "notFound" (type *NotFound): Not Found
+//   - "badRequest" (type *BadRequest): Invalid Request
+//   - "forbidden" (type *Forbidden): Accesso negato
 //   - error: internal error
 func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *User, err error) {
 	var ires any
@@ -99,10 +103,11 @@ func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *User, err e
 
 // Delete calls the "delete" endpoint of the "user" service.
 // Delete may return the following errors:
-//   - "unauthorized" (type *Unauthorized): Autenticazione fallita
-//   - "internalServerError" (type *InternalServerError): Errore nel server
-//   - "notFound" (type *NotFound): Dato non trovato all'interno del sistema
-//   - "badRequest" (type *BadRequest): Parametri non validi
+//   - "unauthorized" (type *Unauthorized): Auth Failed
+//   - "internalServerError" (type *InternalServerError): Internal Server Error
+//   - "notFound" (type *NotFound): Not Found
+//   - "badRequest" (type *BadRequest): Invalid Request
+//   - "forbidden" (type *Forbidden): Accesso negato
 //   - error: internal error
 func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	_, err = c.DeleteEndpoint(ctx, p)

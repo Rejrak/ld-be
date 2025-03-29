@@ -57,3 +57,11 @@ var BadRequest = Type("BadRequest", func() {
 	})
 	Required("name", "id", "message", "temporary", "timeout", "fault")
 })
+
+var Forbidden = Type("Forbidden", func() {
+	Description("Cannot access the resource")
+	Attribute("message", String, "Detailed description of the error", func() {
+		Default("Access to the resource is forbidden")
+	})
+	Required("message")
+})

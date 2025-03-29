@@ -76,10 +76,11 @@ var UserService = Service("user", func() {
 		Path("/user")
 	})
 
-	Error("unauthorized", errors.Unauthorized, "Autenticazione fallita")
-	Error("internalServerError", errors.InternalServerError, "Errore nel server")
-	Error("notFound", errors.NotFound, "Dato non trovato all'interno del sistema")
-	Error("badRequest", errors.BadRequest, "Parametri non validi")
+	Error("unauthorized", errors.Unauthorized, "Auth Failed")
+	Error("internalServerError", errors.InternalServerError, "Internal Server Error")
+	Error("notFound", errors.NotFound, "Not Found")
+	Error("badRequest", errors.BadRequest, "Invalid Request")
+	Error("forbidden", errors.Forbidden, "Accesso negato")
 
 	Method("create", func() {
 		Description("Create a new user")
