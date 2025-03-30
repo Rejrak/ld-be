@@ -324,6 +324,12 @@ paths:
                         $ref: '#/definitions/Unauthorized'
                         required:
                             - message
+                "403":
+                    description: Forbidden response.
+                    schema:
+                        $ref: '#/definitions/Forbidden'
+                        required:
+                            - message
                 "404":
                     description: Not Found response.
                     schema:
@@ -394,6 +400,12 @@ paths:
                         $ref: '#/definitions/Unauthorized'
                         required:
                             - message
+                "403":
+                    description: Forbidden response.
+                    schema:
+                        $ref: '#/definitions/Forbidden'
+                        required:
+                            - message
                 "404":
                     description: Not Found response.
                     schema:
@@ -447,6 +459,12 @@ paths:
                     description: Unauthorized response.
                     schema:
                         $ref: '#/definitions/Unauthorized'
+                        required:
+                            - message
+                "403":
+                    description: Forbidden response.
+                    schema:
+                        $ref: '#/definitions/Forbidden'
                         required:
                             - message
                 "404":
@@ -510,6 +528,20 @@ definitions:
             - temporary
             - timeout
             - fault
+    Forbidden:
+        title: Forbidden
+        type: object
+        properties:
+            message:
+                type: string
+                description: Detailed description of the error
+                default: Access to the resource is forbidden
+                example: Eius corporis esse dolorem ea.
+        description: Accesso negato
+        example:
+            message: Voluptas tempora.
+        required:
+            - message
     InternalServerError:
         title: InternalServerError
         type: object
@@ -518,10 +550,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Errore di comunicazione con il server
-                example: Minima debitis est impedit qui inventore ipsam.
+                example: Expedita corrupti nisi et repellat.
         description: Internal Server Error
         example:
-            message: Qui adipisci est.
+            message: Animi soluta et quod.
         required:
             - message
     NotFound:
@@ -532,10 +564,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Dato non trovato
-                example: Unde excepturi.
+                example: Maiores mollitia provident quia.
         description: Not Found
         example:
-            message: Autem quod.
+            message: Beatae quis facilis qui quis quam.
         required:
             - message
     TrainingPlan:
@@ -663,10 +695,10 @@ definitions:
                 type: string
                 description: Descrizione dell'errore
                 default: Utente già registrato a
-                example: Maiores velit.
+                example: Autem quod.
         description: Auth Failed
         example:
-            message: Perferendis aspernatur et aut.
+            message: Non suscipit nobis placeat omnis ut iusto.
         required:
             - message
     User:
@@ -833,6 +865,12 @@ definitions:
                       name: Upper Body Strength
                       startDate: "2025-03-25T00:00:00Z"
                       userId: 550e8400-e29b-41d4-a716-446655440000
+                    - description: A 4-week plan focused on upper body hypertrophy.
+                      endDate: "2025-04-25T00:00:00Z"
+                      id: 11111111-2222-3333-4444-555555555555
+                      name: Upper Body Strength
+                      startDate: "2025-03-25T00:00:00Z"
+                      userId: 550e8400-e29b-41d4-a716-446655440000
         example:
             admin: false
             firstName: John
@@ -841,18 +879,6 @@ definitions:
             lastName: Doe
             nickname: JD
             trainingPlans:
-                - description: A 4-week plan focused on upper body hypertrophy.
-                  endDate: "2025-04-25T00:00:00Z"
-                  id: 11111111-2222-3333-4444-555555555555
-                  name: Upper Body Strength
-                  startDate: "2025-03-25T00:00:00Z"
-                  userId: 550e8400-e29b-41d4-a716-446655440000
-                - description: A 4-week plan focused on upper body hypertrophy.
-                  endDate: "2025-04-25T00:00:00Z"
-                  id: 11111111-2222-3333-4444-555555555555
-                  name: Upper Body Strength
-                  startDate: "2025-03-25T00:00:00Z"
-                  userId: 550e8400-e29b-41d4-a716-446655440000
                 - description: A 4-week plan focused on upper body hypertrophy.
                   endDate: "2025-04-25T00:00:00Z"
                   id: 11111111-2222-3333-4444-555555555555
