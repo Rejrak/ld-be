@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"os"
 
 	userService "be/gen/user"
 	common "be/internal/features/common"
@@ -18,147 +17,15 @@ import (
 )
 
 type Service struct {
-	Repository   *Repository
-	client       *gocloak.GoCloak
-	clientID     string
-	clientSecret string
-	realm        string
-	access       *common.UserAccess
+	Repository *Repository
+	kc         *common.KcClient
 }
 
 func NewService() *Service {
-	var (
-		client   = gocloak.NewClient("http://keycloak:8080")
-		kcClient = os.Getenv("KC_CLIENT_ID")
-		kcSecret = os.Getenv("KC_CLIENT_SECRET")
-		kcRealm  = os.Getenv("KC_REALM")
-	)
 	return &Service{
-		client:       client,
-		clientID:     kcClient,
-		clientSecret: kcSecret,
-		realm:        kcRealm,
-		Repository:   NewRepository(),
-		access:       common.NewUserAccess(),
+		Repository: NewRepository(),
+		kc:         common.NewKcClient(),
 	}
-}
-
-func (s *Service) GetToken(ctx context.Context) (*gocloak.JWT, error) {
-	token, err := s.client.LoginClient(ctx, s.clientID, s.clientSecret, s.realm)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		rsp := errors.New("errore di comunicazione [DB-FU]")
-		return nil, rsp
-	}
-	return token, nil
-}
-
-func (s *Service) KcCreate(ctx context.Context, userModel User, password string) (uuid *string, err error) {
-	token, err := s.GetToken(ctx)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return nil, errors.New("communication error [KC-TK]")
-	}
-
-	kcUser := gocloak.User{
-		Username:      gocloak.StringP(userModel.Nickname),
-		Enabled:       gocloak.BoolP(true),
-		EmailVerified: gocloak.BoolP(true),
-		FirstName:     (*string)(&userModel.FirstName),
-		LastName:      (*string)(&userModel.LastName),
-	}
-
-	userID, err := s.client.CreateUser(ctx, token.AccessToken, s.realm, kcUser)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "KC_UC", V: err}, err)
-		return nil, errors.New("user already exists")
-	}
-
-	if err := s.client.SetPassword(ctx, token.AccessToken, userID, s.realm, password, false); err != nil {
-		return nil, errors.New("communication error [KC-SP]")
-	}
-
-	uuid = &userID
-
-	return
-}
-
-func (s *Service) KcUpdate(ctx context.Context, firstName, lastName *string, uuid string) (err error) {
-	token, err := s.GetToken(ctx)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return err
-	}
-
-	kcUser := gocloak.User{ID: &uuid}
-	if firstName != nil && *firstName != "" {
-		kcUser.FirstName = firstName
-	}
-	if lastName != nil && *lastName != "" {
-		kcUser.LastName = lastName
-	}
-
-	if err := s.client.UpdateUser(ctx, token.AccessToken, s.realm, kcUser); err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return errors.New("communication error [KC-UU]")
-	}
-
-	return nil
-}
-
-func (s *Service) KcDelete(ctx context.Context, uuid string) error {
-	token, err := s.GetToken(ctx)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return errors.New("communication error [KC-TK]")
-	}
-
-	if err := s.client.DeleteUser(ctx, token.AccessToken, s.realm, uuid); err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return errors.New("communication error [KC-DU]")
-	}
-	return nil
-}
-
-func (s *Service) KcGetUser(ctx context.Context, uuid string) (*gocloak.User, error) {
-	token, err := s.GetToken(ctx)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return nil, errors.New("communication error [KC-TK]")
-	}
-
-	user, err := s.client.GetUserByID(ctx, token.AccessToken, s.realm, uuid)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-		return nil, errors.New("communication error [KC-GU]")
-	}
-
-	return user, nil
-}
-
-func (s *Service) KcGetUserGroups(ctx context.Context, uuid string) ([]*gocloak.Group, error) {
-	token, err := s.GetToken(ctx)
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "KC-TK", V: err}, err)
-		return nil, &userService.InternalServerError{Message: "Internal Server error"}
-	}
-
-	groups, err := s.client.GetUserGroups(ctx, token.AccessToken, s.realm, uuid, gocloak.GetGroupsParams{})
-	if err != nil {
-		utils.Log.Error(ctx, log.KV{K: "KC-FG", V: err}, err)
-		return nil, &userService.InternalServerError{Message: "Internal Server error"}
-	}
-
-	for _, group := range groups {
-		fullGroup, err := s.client.GetGroup(ctx, token.AccessToken, s.realm, *group.ID)
-		if err != nil {
-			utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
-			continue
-		}
-		utils.Log.Info(ctx, log.KV{K: "group", V: *fullGroup.Name})
-		utils.Log.Info(ctx, log.KV{K: "attributes", V: *fullGroup.Attributes})
-	}
-	return groups, nil
 }
 
 func (s *Service) parseUserAccess(groups []*gocloak.Group) {
@@ -174,16 +41,16 @@ func (s *Service) parseUserAccess(groups []*gocloak.Group) {
 
 		switch *group.Name {
 		case "pro":
-			s.access.Detail = true
-			s.access.List = true
+			s.kc.UserAccess.Detail = true
+			s.kc.UserAccess.List = true
 			if paid {
-				s.access.Edit = true
+				s.kc.UserAccess.Edit = true
 			}
 		case "base":
-			s.access.Detail = true
-			s.access.List = false
+			s.kc.UserAccess.Detail = true
+			s.kc.UserAccess.List = false
 			if paid {
-				s.access.Edit = true
+				s.kc.UserAccess.Edit = true
 			}
 		}
 	}
@@ -201,7 +68,7 @@ func (s *Service) OAuth2Auth(ctx context.Context, token string, schema *security
 		return ctx, errors.New("invalid token")
 	}
 
-	groups, err := s.KcGetUserGroups(ctx, claims["sub"].(string))
+	groups, err := s.kc.KcGetUserGroups(ctx, claims["sub"].(string))
 	if err != nil {
 		utils.Log.Error(ctx, log.KV{K: "error", V: err}, err)
 		return ctx, &userService.InternalServerError{Message: "Internal Server error"}
@@ -282,7 +149,7 @@ func (s *Service) Get(ctx context.Context, payload *userService.GetPayload) (*us
 }
 
 func (s *Service) List(ctx context.Context, payload *userService.ListPayload) ([]*userService.User, error) {
-	if !s.access.List {
+	if !s.kc.UserAccess.List {
 		return nil, &userService.Forbidden{Message: "Forbidden"}
 	}
 
