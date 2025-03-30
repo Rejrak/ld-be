@@ -410,7 +410,7 @@ List all users with pagination
     -token STRING: 
 
 Example:
-    %[1]s user list --limit 10 --offset 0 --token "Quibusdam nisi ipsa."
+    %[1]s user list --limit 10 --offset 0 --token "Non est cum quam molestias."
 `, os.Args[0])
 }
 
@@ -428,7 +428,7 @@ Example:
       "firstName": "John",
       "lastName": "Doe",
       "nickname": "JD"
-   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Molestias non."
+   }' --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Sit repudiandae ratione ducimus."
 `, os.Args[0])
 }
 
@@ -440,6 +440,6 @@ Delete a user
     -token STRING: 
 
 Example:
-    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Non est itaque laborum deleniti sint vel."
+    %[1]s user delete --id "f47ac10b-58cc-4372-a567-0e02b2c3d479" --token "Eum enim et maiores."
 `, os.Args[0])
 }

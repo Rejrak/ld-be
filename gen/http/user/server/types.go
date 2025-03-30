@@ -116,6 +116,13 @@ type GetBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// GetForbiddenResponseBody is the type of the "user" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message string `form:"message" json:"message" xml:"message"`
+}
+
 // GetInternalServerErrorResponseBody is the type of the "user" service "get"
 // endpoint HTTP response body for the "internalServerError" error.
 type GetInternalServerErrorResponseBody struct {
@@ -154,6 +161,13 @@ type UpdateBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// UpdateForbiddenResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message string `form:"message" json:"message" xml:"message"`
+}
+
 // UpdateInternalServerErrorResponseBody is the type of the "user" service
 // "update" endpoint HTTP response body for the "internalServerError" error.
 type UpdateInternalServerErrorResponseBody struct {
@@ -190,6 +204,13 @@ type DeleteBadRequestResponseBody struct {
 	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
 	// Indica se l'errore è dovuto a un problema del server
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteForbiddenResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message string `form:"message" json:"message" xml:"message"`
 }
 
 // DeleteInternalServerErrorResponseBody is the type of the "user" service
@@ -337,6 +358,15 @@ func NewGetBadRequestResponseBody(res *user.BadRequest) *GetBadRequestResponseBo
 	return body
 }
 
+// NewGetForbiddenResponseBody builds the HTTP response body from the result of
+// the "get" endpoint of the "user" service.
+func NewGetForbiddenResponseBody(res *user.Forbidden) *GetForbiddenResponseBody {
+	body := &GetForbiddenResponseBody{
+		Message: res.Message,
+	}
+	return body
+}
+
 // NewGetInternalServerErrorResponseBody builds the HTTP response body from the
 // result of the "get" endpoint of the "user" service.
 func NewGetInternalServerErrorResponseBody(res *user.InternalServerError) *GetInternalServerErrorResponseBody {
@@ -378,6 +408,15 @@ func NewUpdateBadRequestResponseBody(res *user.BadRequest) *UpdateBadRequestResp
 	return body
 }
 
+// NewUpdateForbiddenResponseBody builds the HTTP response body from the result
+// of the "update" endpoint of the "user" service.
+func NewUpdateForbiddenResponseBody(res *user.Forbidden) *UpdateForbiddenResponseBody {
+	body := &UpdateForbiddenResponseBody{
+		Message: res.Message,
+	}
+	return body
+}
+
 // NewUpdateInternalServerErrorResponseBody builds the HTTP response body from
 // the result of the "update" endpoint of the "user" service.
 func NewUpdateInternalServerErrorResponseBody(res *user.InternalServerError) *UpdateInternalServerErrorResponseBody {
@@ -415,6 +454,15 @@ func NewDeleteBadRequestResponseBody(res *user.BadRequest) *DeleteBadRequestResp
 		Temporary: res.Temporary,
 		Timeout:   res.Timeout,
 		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteForbiddenResponseBody builds the HTTP response body from the result
+// of the "delete" endpoint of the "user" service.
+func NewDeleteForbiddenResponseBody(res *user.Forbidden) *DeleteForbiddenResponseBody {
+	body := &DeleteForbiddenResponseBody{
+		Message: res.Message,
 	}
 	return body
 }

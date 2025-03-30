@@ -115,6 +115,13 @@ type GetBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// GetForbiddenResponseBody is the type of the "user" service "get" endpoint
+// HTTP response body for the "forbidden" error.
+type GetForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+}
+
 // GetInternalServerErrorResponseBody is the type of the "user" service "get"
 // endpoint HTTP response body for the "internalServerError" error.
 type GetInternalServerErrorResponseBody struct {
@@ -153,6 +160,13 @@ type UpdateBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// UpdateForbiddenResponseBody is the type of the "user" service "update"
+// endpoint HTTP response body for the "forbidden" error.
+type UpdateForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+}
+
 // UpdateInternalServerErrorResponseBody is the type of the "user" service
 // "update" endpoint HTTP response body for the "internalServerError" error.
 type UpdateInternalServerErrorResponseBody struct {
@@ -189,6 +203,13 @@ type DeleteBadRequestResponseBody struct {
 	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
 	// Indica se l'errore è dovuto a un problema del server
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// DeleteForbiddenResponseBody is the type of the "user" service "delete"
+// endpoint HTTP response body for the "forbidden" error.
+type DeleteForbiddenResponseBody struct {
+	// Detailed description of the error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 }
 
 // DeleteInternalServerErrorResponseBody is the type of the "user" service
@@ -339,6 +360,15 @@ func NewGetBadRequest(body *GetBadRequestResponseBody) *user.BadRequest {
 	return v
 }
 
+// NewGetForbidden builds a user service get endpoint forbidden error.
+func NewGetForbidden(body *GetForbiddenResponseBody) *user.Forbidden {
+	v := &user.Forbidden{
+		Message: *body.Message,
+	}
+
+	return v
+}
+
 // NewGetInternalServerError builds a user service get endpoint
 // internalServerError error.
 func NewGetInternalServerError(body *GetInternalServerErrorResponseBody) *user.InternalServerError {
@@ -412,6 +442,15 @@ func NewUpdateBadRequest(body *UpdateBadRequestResponseBody) *user.BadRequest {
 	return v
 }
 
+// NewUpdateForbidden builds a user service update endpoint forbidden error.
+func NewUpdateForbidden(body *UpdateForbiddenResponseBody) *user.Forbidden {
+	v := &user.Forbidden{
+		Message: *body.Message,
+	}
+
+	return v
+}
+
 // NewUpdateInternalServerError builds a user service update endpoint
 // internalServerError error.
 func NewUpdateInternalServerError(body *UpdateInternalServerErrorResponseBody) *user.InternalServerError {
@@ -450,6 +489,15 @@ func NewDeleteBadRequest(body *DeleteBadRequestResponseBody) *user.BadRequest {
 		Temporary: *body.Temporary,
 		Timeout:   *body.Timeout,
 		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewDeleteForbidden builds a user service delete endpoint forbidden error.
+func NewDeleteForbidden(body *DeleteForbiddenResponseBody) *user.Forbidden {
+	v := &user.Forbidden{
+		Message: *body.Message,
 	}
 
 	return v
@@ -587,6 +635,15 @@ func ValidateGetBadRequestResponseBody(body *GetBadRequestResponseBody) (err err
 	return
 }
 
+// ValidateGetForbiddenResponseBody runs the validations defined on
+// get_forbidden_response_body
+func ValidateGetForbiddenResponseBody(body *GetForbiddenResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	return
+}
+
 // ValidateGetInternalServerErrorResponseBody runs the validations defined on
 // get_internalServerError_response_body
 func ValidateGetInternalServerErrorResponseBody(body *GetInternalServerErrorResponseBody) (err error) {
@@ -638,6 +695,15 @@ func ValidateUpdateBadRequestResponseBody(body *UpdateBadRequestResponseBody) (e
 	return
 }
 
+// ValidateUpdateForbiddenResponseBody runs the validations defined on
+// update_forbidden_response_body
+func ValidateUpdateForbiddenResponseBody(body *UpdateForbiddenResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	return
+}
+
 // ValidateUpdateInternalServerErrorResponseBody runs the validations defined
 // on update_internalServerError_response_body
 func ValidateUpdateInternalServerErrorResponseBody(body *UpdateInternalServerErrorResponseBody) (err error) {
@@ -685,6 +751,15 @@ func ValidateDeleteBadRequestResponseBody(body *DeleteBadRequestResponseBody) (e
 	}
 	if body.Fault == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateDeleteForbiddenResponseBody runs the validations defined on
+// delete_forbidden_response_body
+func ValidateDeleteForbiddenResponseBody(body *DeleteForbiddenResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
 	}
 	return
 }

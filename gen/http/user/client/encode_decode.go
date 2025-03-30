@@ -149,6 +149,7 @@ func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // after having been read.
 // DecodeGetResponse may return the following errors:
 //   - "badRequest" (type *user.BadRequest): http.StatusBadRequest
+//   - "forbidden" (type *user.Forbidden): http.StatusForbidden
 //   - "internalServerError" (type *user.InternalServerError): http.StatusInternalServerError
 //   - "notFound" (type *user.NotFound): http.StatusNotFound
 //   - "unauthorized" (type *user.Unauthorized): http.StatusUnauthorized
@@ -197,6 +198,20 @@ func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 				return nil, goahttp.ErrValidationError("user", "get", err)
 			}
 			return nil, NewGetBadRequest(&body)
+		case http.StatusForbidden:
+			var (
+				body GetForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "get", err)
+			}
+			err = ValidateGetForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "get", err)
+			}
+			return nil, NewGetForbidden(&body)
 		case http.StatusInternalServerError:
 			var (
 				body GetInternalServerErrorResponseBody
@@ -385,6 +400,7 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // restored after having been read.
 // DecodeUpdateResponse may return the following errors:
 //   - "badRequest" (type *user.BadRequest): http.StatusBadRequest
+//   - "forbidden" (type *user.Forbidden): http.StatusForbidden
 //   - "internalServerError" (type *user.InternalServerError): http.StatusInternalServerError
 //   - "notFound" (type *user.NotFound): http.StatusNotFound
 //   - "unauthorized" (type *user.Unauthorized): http.StatusUnauthorized
@@ -433,6 +449,20 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 				return nil, goahttp.ErrValidationError("user", "update", err)
 			}
 			return nil, NewUpdateBadRequest(&body)
+		case http.StatusForbidden:
+			var (
+				body UpdateForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "update", err)
+			}
+			err = ValidateUpdateForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "update", err)
+			}
+			return nil, NewUpdateForbidden(&body)
 		case http.StatusInternalServerError:
 			var (
 				body UpdateInternalServerErrorResponseBody
@@ -532,6 +562,7 @@ func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // restored after having been read.
 // DecodeDeleteResponse may return the following errors:
 //   - "badRequest" (type *user.BadRequest): http.StatusBadRequest
+//   - "forbidden" (type *user.Forbidden): http.StatusForbidden
 //   - "internalServerError" (type *user.InternalServerError): http.StatusInternalServerError
 //   - "notFound" (type *user.NotFound): http.StatusNotFound
 //   - "unauthorized" (type *user.Unauthorized): http.StatusUnauthorized
@@ -567,6 +598,20 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 				return nil, goahttp.ErrValidationError("user", "delete", err)
 			}
 			return nil, NewDeleteBadRequest(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "delete", err)
+			}
+			err = ValidateDeleteForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "delete", err)
+			}
+			return nil, NewDeleteForbidden(&body)
 		case http.StatusInternalServerError:
 			var (
 				body DeleteInternalServerErrorResponseBody
