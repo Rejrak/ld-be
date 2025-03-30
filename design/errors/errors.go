@@ -9,6 +9,7 @@ func CommonResponses() {
 	Response("unauthorized", StatusUnauthorized)
 	Response("internalServerError", StatusInternalServerError)
 	Response("notFound", StatusNotFound)
+	Response("forbidden", StatusForbidden)
 }
 
 var Unauthorized = Type("Unauthorized", func() {
