@@ -136,7 +136,7 @@ func (s *Service) Update(ctx context.Context, payload *trainingplanService.Updat
 		return nil, errors.New("invalid startDate format")
 	}
 
-	endDate, err := parseDate(payload.StartDate)
+	endDate, err := parseDate(payload.EndDate)
 	if err != nil {
 		return nil, errors.New("invalid endDate format")
 	}
@@ -145,7 +145,9 @@ func (s *Service) Update(ctx context.Context, payload *trainingplanService.Updat
 	tp.Description = payload.Description
 	tp.StartDate = startDate
 	tp.EndDate = endDate
-	tp.UserID = uuid.MustParse(payload.UserID)
+	if tp.UserID, err = uuid.Parse(payload.UserID); err != nil {
+		return nil, errors.New("invalid UserID format")
+	}
 
 	saved, err := s.Repository.Save(ctx, *tp)
 	if err != nil {
